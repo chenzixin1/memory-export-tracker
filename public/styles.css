@@ -657,6 +657,10 @@ dd {
   min-height: 286px;
 }
 
+.prelim-panel .chart-frame.small {
+  min-height: 470px;
+}
+
 .three-chart-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1227,6 +1231,14 @@ dd {
   gap: 14px;
 }
 
+.prelim-panel {
+  grid-column: 1 / -1;
+}
+
+.lower-grid > .chart-panel {
+  grid-column: 1 / -1;
+}
+
 .chart-empty {
   display: grid;
   place-items: center;
@@ -1478,7 +1490,7 @@ dd {
 .source-list {
   display: grid;
   gap: 7px;
-  max-height: 116px;
+  max-height: 168px;
   overflow: auto;
   padding-right: 2px;
 }
@@ -1501,6 +1513,56 @@ dd {
 .source-list a:hover {
   border-color: var(--line-strong);
   background: var(--paper-strong);
+}
+
+.source-list .stacked-source-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 1fr) repeat(3, minmax(88px, 0.8fr)) minmax(88px, 0.8fr);
+  align-items: center;
+}
+
+.source-list .stacked-source-row em {
+  color: var(--muted);
+  font-style: normal;
+  text-align: right;
+}
+
+.source-list .stacked-source-row strong {
+  text-align: right;
+}
+
+.stacked-source-head {
+  min-height: 28px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.stacked-source-head span,
+.stacked-source-head em,
+.stacked-source-head strong {
+  color: var(--muted);
+}
+
+.stack-total {
+  fill: var(--muted);
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.stack-segment {
+  shape-rendering: geometricPrecision;
+}
+
+.stack-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.stacked-legend i {
+  height: 8px;
 }
 
 svg {
@@ -1709,6 +1771,14 @@ svg text {
 
   .monthly-official {
     grid-template-columns: 1fr;
+  }
+
+  .source-list .stacked-source-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .source-list .stacked-source-row span {
+    grid-column: 1 / -1;
   }
 
   .memory-focus-kpis {

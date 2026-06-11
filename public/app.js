@@ -362,6 +362,157 @@ function chartSvg({ series, labels, formatter, height = 360, chartType = "line",
     </svg>${legend}`;
 }
 
+const preliminaryStackSegments = [
+  { key: "first10", label: "1-10日", color: "#8f4f19" },
+  { key: "secondTen", label: "11-20日", color: "#c47a2e" },
+  { key: "combinedFirstTwenty", label: "1-20日累计（未拆）", color: "#9a7b62", pattern: true },
+  { key: "tail", label: "21-月末", color: "#e0ad6f" }
+];
+
+function monthLabelFromPeriod(period) {
+  const [year, month] = period.split(".").map(Number);
+  return `${year}年${month}月`;
+}
+
+function preliminaryMonthBreakdown() {
+  const months = new Map();
+  const ensureMonth = (period) => {
+    const monthKey = period.slice(0, 7);
+    if (!months.has(monthKey)) {
+      months.set(monthKey, {
+        monthKey,
+        monthLabel: monthLabelFromPeriod(monthKey),
+        first10: null,
+        first20: null,
+        secondTen: null,
+        tail: null,
+        full: null,
+        combinedFirstTwenty: null,
+        sources: []
+      });
+    }
+    return months.get(monthKey);
+  };
+
+  (state.data.preliminary ?? []).forEach((point) => {
+    const month = ensureMonth(point.period);
+    month.sources.push(point);
+    if (point.period.endsWith("-1~10")) month.first10 = point.valueUsd;
+    if (point.period.endsWith("-1~20")) month.first20 = point.valueUsd;
+    if (point.period.includes("-21~")) month.tail = point.valueUsd;
+    if (point.period.endsWith("-1~31")) month.full = point.valueUsd;
+  });
+
+  (state.data.officialMonthly ?? []).forEach((point) => {
+    const month = months.get(point.period);
+    if (month && !month.full) {
+      month.full = point.valueUsd;
+      month.sources.push(point);
+    }
+  });
+
+  return [...months.values()]
+    .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+    .map((month) => {
+      const first10 = Number.isFinite(month.first10) ? month.first10 : null;
+      const secondTen =
+        Number.isFinite(month.first20) && Number.isFinite(first10) ? Math.max(month.first20 - first10, 0) : null;
+      const combinedFirstTwenty = Number.isFinite(month.first20) && !Number.isFinite(first10) ? month.first20 : null;
+      const tail =
+        Number.isFinite(month.tail)
+          ? month.tail
+          : Number.isFinite(month.full) && Number.isFinite(month.first20)
+            ? Math.max(month.full - month.first20, 0)
+            : null;
+      const knownTotal = [first10, secondTen, tail, combinedFirstTwenty].filter(Number.isFinite).reduce((sum, value) => sum + value, 0);
+      return {
+        ...month,
+        first10,
+        secondTen,
+        tail,
+        combinedFirstTwenty,
+        knownTotal,
+        complete: Number.isFinite(first10) && Number.isFinite(secondTen) && Number.isFinite(tail),
+        sourceUrl: month.sources.at(-1)?.sourceUrl ?? "#",
+        sourceName: month.sources.at(-1)?.sourceName ?? "source"
+      };
+    });
+}
+
+function stackedSemiconductorSvg(months, height = 430) {
+  if (!months.length) return `<div class="chart-empty">暂无可用数据</div>`;
+
+  const width = 1120;
+  const padding = { top: 30, right: 28, bottom: 58, left: 82 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const max = Math.max(...months.map((month) => month.knownTotal), 1) * 1.12;
+  const scaleY = (value) => padding.top + plotHeight - (value / max) * plotHeight;
+  const scaleX = (index) => padding.left + (months.length === 1 ? plotWidth / 2 : (plotWidth / (months.length - 1)) * index);
+  const barWidth = Math.min(104, plotWidth / Math.max(months.length, 1) * 0.58);
+  const ticks = Array.from({ length: 5 }, (_, index) => (max / 4) * index);
+
+  const grid = ticks
+    .map((tick) => {
+      const y = scaleY(tick);
+      return `<line class="gridline" x1="${padding.left}" x2="${width - padding.right}" y1="${y}" y2="${y}"></line>
+        <text x="${padding.left - 10}" y="${y + 4}" text-anchor="end">${compactUsd(tick)}</text>`;
+    })
+    .join("");
+
+  const defs = `<defs>
+    <pattern id="combined-first-twenty" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#9a7b62"></rect>
+      <rect width="3" height="8" fill="#d6c8b8" opacity="0.55"></rect>
+    </pattern>
+  </defs>`;
+
+  const bars = months
+    .map((month, index) => {
+      const x = scaleX(index) - barWidth / 2;
+      let cursor = height - padding.bottom;
+      const segmentRects = preliminaryStackSegments
+        .map((segment) => {
+          const value = month[segment.key];
+          if (!Number.isFinite(value) || value <= 0) return "";
+          const segmentHeight = height - padding.bottom - scaleY(value);
+          cursor -= segmentHeight;
+          const fill = segment.pattern ? "url(#combined-first-twenty)" : segment.color;
+          return `<rect class="stack-segment" x="${x}" y="${cursor}" width="${barWidth}" height="${segmentHeight}" fill="${fill}"></rect>`;
+        })
+        .join("");
+      const rows = preliminaryStackSegments
+        .map((segment) => {
+          const value = month[segment.key];
+          return Number.isFinite(value) && value > 0 ? { color: segment.color, name: segment.label, value: compactUsd(value) } : null;
+        })
+        .filter(Boolean);
+      if (!month.complete) rows.push({ color: "#6b7280", name: "覆盖", value: "公开源未完整拆分" });
+      const tooltip = tooltipHtml(month.monthLabel, rows);
+      const title = tooltipText(month.monthLabel, rows);
+      return `${segmentRects}
+        <text class="stack-total" x="${scaleX(index)}" y="${Math.max(cursor - 8, 14)}" text-anchor="middle">${compactUsd(month.knownTotal)}</text>
+        <rect class="hit-zone stack-hit" x="${x - 8}" y="${padding.top}" width="${barWidth + 16}" height="${plotHeight}" data-label="${escapeHtml(month.monthLabel)}" data-tooltip="${escapeHtml(tooltip)}" data-source-url="${escapeHtml(month.sourceUrl)}"><title>${escapeHtml(title)}</title></rect>`;
+    })
+    .join("");
+
+  const xLabels = months
+    .map((month, index) => `<text x="${scaleX(index)}" y="${height - 18}" text-anchor="middle">${escapeHtml(month.monthLabel.replace("2026年", ""))}</text>`)
+    .join("");
+  const legend = `<div class="legend stacked-legend">${preliminaryStackSegments
+    .map((segment) => `<span><i style="background:${segment.pattern ? "#9a7b62" : segment.color}"></i>${segment.label}</span>`)
+    .join("")}</div>`;
+
+  return `<svg class="stacked-prelim-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="半导体旬度拆解堆叠柱状图">
+      ${defs}
+      ${grid}
+      <text class="axis-label" x="${padding.left}" y="16" text-anchor="start">半导体出口金额</text>
+      <line class="axis" x1="${padding.left}" x2="${width - padding.right}" y1="${height - padding.bottom}" y2="${height - padding.bottom}"></line>
+      ${xLabels}
+      ${bars}
+    </svg>${legend}`;
+}
+
 function lineSegments(points, scaleX, scaleY) {
   const segments = [];
   let current = [];
@@ -898,6 +1049,7 @@ function renderPrelimChart() {
   document.querySelector("#officialCoverageBadge").innerHTML = `<span>半导体总量</span><em>月度${escapeHtml(coverageSentence(monthlyFreshness))}；旬度${escapeHtml(coverageSentence(tenDayFreshness))}</em>`;
   const monthlyOfficial = state.data.officialMonthly ?? [];
   const latestPreliminary = state.data.preliminary?.at(-1);
+  const stackedMonths = preliminaryMonthBreakdown();
   const monthlyCards = monthlyOfficial
     .map(
       (point) => `<a href="${escapeHtml(point.sourceUrl)}" target="_blank" rel="noreferrer">
@@ -915,39 +1067,32 @@ function renderPrelimChart() {
       </a>`
     : "";
   document.querySelector("#monthlyOfficial").innerHTML = monthlyCards + latestPreliminaryCard;
-  const labels = state.data.preliminary.map((point) => point.periodLabel);
   const latest = latestPreliminary;
   document.querySelector("#prelimCaption").textContent = latest?.sourceName
-    ? `最新：${latest.periodLabel} 累计半导体出口 ${compactUsd(latest.valueUsd)}；这是 1-10 日窗口暂定值，不是 6 月 10 日单日值。来源：${latest.sourceName}`
+    ? `最新：${latest.periodLabel} 累计半导体出口 ${compactUsd(latest.valueUsd)}。每个月一根柱，尽量拆成 1-10 日、11-20 日、21-月末；1/2 月当前公开库只有 1-20 日累计，6 月当前只有 1-10 日。`
     : "用于观察 KCS 旬度简报口径下的半导体出口节奏。";
-  const series = [
-    {
-      name: "半导体出口金额",
-      color: colors.semiconductor,
-      points: state.data.preliminary.map((point) => ({
-        label: point.periodLabel,
-        value: point.valueUsd,
-        sourceName: point.sourceName,
-        sourceUrl: point.sourceUrl
-      }))
-    }
-  ];
-  document.querySelector("#prelimChart").innerHTML = chartSvg({
-    series,
-    labels,
-    formatter: compactUsd,
-    height: 280,
-    chartType: "bar"
-  });
+  document.querySelector("#prelimChart").innerHTML = stackedSemiconductorSvg(stackedMonths, 430);
   document.querySelector("#sourceList").innerHTML = state.data.preliminary
-    .map(
-      (point) =>
-        `<a href="${escapeHtml(point.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">
-          <span>${escapeHtml(point.periodLabel)}</span>
-          <strong>${compactUsd(point.valueUsd)}</strong>
-        </a>`
-    )
-    .join("");
+    ? `<div class="stacked-source-row stacked-source-head">
+        <span>月份</span>
+        <em>1-10 / 1-20未拆</em>
+        <em>11-20</em>
+        <em>21-月末</em>
+        <strong>已披露合计</strong>
+      </div>` +
+      stackedMonths
+        .map(
+          (month) =>
+            `<a class="stacked-source-row" href="${escapeHtml(month.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">
+              <span>${escapeHtml(month.monthLabel)}</span>
+              <em>${Number.isFinite(month.first10) ? compactUsd(month.first10) : Number.isFinite(month.combinedFirstTwenty) ? `${compactUsd(month.combinedFirstTwenty)} 1-20累计` : "n/a"}</em>
+              <em>${Number.isFinite(month.secondTen) ? compactUsd(month.secondTen) : "n/a"}</em>
+              <em>${Number.isFinite(month.tail) ? compactUsd(month.tail) : "n/a"}</em>
+              <strong>${compactUsd(month.knownTotal)}</strong>
+            </a>`
+        )
+        .join("")
+    : "";
   bindChartInteractions(document.querySelector("#prelimChart"));
 }
 
