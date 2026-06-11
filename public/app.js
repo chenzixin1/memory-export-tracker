@@ -252,10 +252,6 @@ function tooltipHtml(label, rows) {
     .join("")}`;
 }
 
-function tooltipText(label, rows) {
-  return `${label}\n${rows.map((row) => `${row.name}: ${row.value}`).join("\n")}`;
-}
-
 function shouldShowXAxisLabel(labels, index) {
   if (labels.length <= 10) return true;
   if (index === 0 || index === labels.length - 1) return true;
@@ -307,11 +303,7 @@ function chartSvg({ series, labels, formatter, height = 360, chartType = "line",
               { color: item.color, name: item.name, value: formatter(point.value) },
               ...(point.sourceName ? [{ color: "#6b7280", name: "来源", value: point.sourceName }] : [])
             ]);
-            const title = tooltipText(point.label ?? labels[index], [
-              { name: item.name, value: formatter(point.value) },
-              ...(point.sourceName ? [{ name: "来源", value: point.sourceName }] : [])
-            ]);
-            return `<rect class="bar-mark" x="${x}" y="${y}" width="${barWidth - 2}" height="${height - padding.bottom - y}" rx="4" fill="${item.color}" data-label="${escapeHtml(point.label ?? labels[index])}" data-tooltip="${escapeHtml(tooltip)}" data-source-url="${escapeHtml(point.sourceUrl ?? "")}"><title>${escapeHtml(title)}</title></rect>`;
+            return `<rect class="bar-mark" x="${x}" y="${y}" width="${barWidth - 2}" height="${height - padding.bottom - y}" rx="4" fill="${item.color}" data-label="${escapeHtml(point.label ?? labels[index])}" data-tooltip="${escapeHtml(tooltip)}" data-source-url="${escapeHtml(point.sourceUrl ?? "")}"></rect>`;
           })
           .join("");
       }
@@ -343,7 +335,7 @@ function chartSvg({ series, labels, formatter, height = 360, chartType = "line",
                 return point ? { color: item.color, name: item.name, value: formatter(point.value) } : null;
               })
               .filter(Boolean);
-            return `<rect class="hit-zone" x="${start}" y="${padding.top}" width="${end - start}" height="${plotHeight}" data-label="${escapeHtml(label)}" data-tooltip="${escapeHtml(tooltipHtml(label, rows))}"><title>${escapeHtml(tooltipText(label, rows))}</title></rect>`;
+            return `<rect class="hit-zone" x="${start}" y="${padding.top}" width="${end - start}" height="${plotHeight}" data-label="${escapeHtml(label)}" data-tooltip="${escapeHtml(tooltipHtml(label, rows))}"></rect>`;
           })
           .join("")
       : "";
@@ -539,10 +531,9 @@ function stackedSemiconductorSvg(months, height = 430) {
       });
       if (Number.isFinite(month.fullYoYPct)) rows.push({ color: "#111827", name: "完整月 YoY", value: formatChange(month.fullYoYPct) });
       const tooltip = tooltipHtml(month.monthLabel, rows);
-      const title = tooltipText(month.monthLabel, rows);
       return `${segmentRects}
         <text class="stack-total" x="${scaleX(index)}" y="${Math.max(cursor - 8, 14)}" text-anchor="middle">${compactUsd(month.knownTotal)}</text>
-        <rect class="hit-zone stack-hit" x="${x - 8}" y="${padding.top}" width="${barWidth + 16}" height="${plotHeight}" data-label="${escapeHtml(month.monthLabel)}" data-tooltip="${escapeHtml(tooltip)}" data-source-url="${escapeHtml(month.sourceUrl)}"><title>${escapeHtml(title)}</title></rect>`;
+        <rect class="hit-zone stack-hit" x="${x - 8}" y="${padding.top}" width="${barWidth + 16}" height="${plotHeight}" data-label="${escapeHtml(month.monthLabel)}" data-tooltip="${escapeHtml(tooltip)}" data-source-url="${escapeHtml(month.sourceUrl)}"></rect>`;
     })
     .join("");
 
@@ -682,7 +673,7 @@ function amountGrowthDualAxisSvg({ points, labels, metric, selectedLabel = null,
         { color: "#b45f17", name: "YoY", value: formatChange(point.yoyPct) },
         { color: "#118273", name: "MoM", value: formatChange(point.sequentialPct) }
       ];
-      return `<rect class="hit-zone" x="${start}" y="${padding.top}" width="${end - start}" height="${plotHeight}" data-label="${escapeHtml(point.period)}" data-tooltip="${escapeHtml(tooltipHtml(point.periodLabel, rows))}"><title>${escapeHtml(tooltipText(point.periodLabel, rows))}</title></rect>`;
+      return `<rect class="hit-zone" x="${start}" y="${padding.top}" width="${end - start}" height="${plotHeight}" data-label="${escapeHtml(point.period)}" data-tooltip="${escapeHtml(tooltipHtml(point.periodLabel, rows))}"></rect>`;
     })
     .join("");
   const legend = `<div class="legend dual-axis-legend">
