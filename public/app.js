@@ -39,6 +39,54 @@ const displaySegments = [
   { key: "nand", label: "NAND", category: "Flash memory", productKey: null, hsCode: "暂估" }
 ];
 
+const taiwanHsGuide = [
+  {
+    code: "85423200234",
+    label: "台湾进口 HBM/DRAM 正码",
+    status: "待接入",
+    role: "台湾从韩国、日本进口的动态随机存取记忆体积体电路。HBM通常落在这个DRAM/Memory口径里，是朋友说应补的核心台湾进口端信号。",
+    caveat: "不是台湾官方单独标注的纯HBM码；仍需按来源国、单价、重量和数量做sanity check。",
+    links: [
+      { label: "商品分类查询", url: "https://fbfh.trade.gov.tw/fh/ap/queryCCCRegFormf_e.do" },
+      { label: "贸易统计查询", url: "https://publicinfo.trade.gov.tw/cuswebo/FSCE3000C?table=FSCE3010F" },
+      { label: "编码说明快照", url: "https://data.zhupiter.com/oddt/12722493/85423200234/" }
+    ]
+  },
+  {
+    code: "84715000003",
+    label: "台湾出口 GPU/AI server 正码",
+    status: "待接入",
+    role: "台湾出口的处理单元，包含AI GPU服务器、普通CPU服务器等混合货流。应按目的地、单价和kg/SET拆分，筛出高置信度AI服务器。",
+    caveat: "这是混合码，不等于纯NVDA GPU；低单价服务器需要剔除或折价。",
+    links: [
+      { label: "商品分类查询", url: "https://fbfh.trade.gov.tw/fh/ap/queryCCCRegFormf_e.do" },
+      { label: "贸易统计查询", url: "https://publicinfo.trade.gov.tw/cuswebo/FSCE3000C?table=FSCE3010F" },
+      { label: "编码说明快照", url: "https://data.zhupiter.com/oddt/12720057/84715000003/" }
+    ]
+  },
+  {
+    code: "Section XVI",
+    label: "当前页面的韩国→台湾代理",
+    status: "已展示",
+    role: "台湾从韩国进口的机械及电机设备大类。它能提示韩国到台湾电子供应链拉货方向，但不是单一HS/CCC存储芯片码。",
+    caveat: "只能作为方向性代理，不能替代85423200234的HBM/DRAM进口明细。",
+    links: [
+      { label: "政府开放资料", url: "https://data.gov.tw/en/datasets/8383" },
+      { label: "按主要国别资料", url: "https://data.nat.gov.tw/dataset/28573" }
+    ]
+  },
+  {
+    code: "852351000",
+    label: "日本→台湾 SSD 辅助线",
+    status: "已展示",
+    role: "日本财务省出口端对台湾的固态非易失存储设备。用于观察SSD链条，不是HBM/NVDA主线。",
+    caveat: "金额单位为日元，数量单位为台；和台湾进口端HS/CCC口径不可直接相加。",
+    links: [
+      { label: "日本e-Stat", url: "https://www.e-stat.go.jp/en/stat-search/files?cycle=1&cycle_facet=cycle&data=1&layout=datalist&metadata=1&page=1&tclass1=000001013180&tclass2=000001013181&tclass3val=0&toukei=00350300&tstat=000001013141" }
+    ]
+  }
+];
+
 const memoryCategoryMonthlyProducts = {
   SSD: "ssd",
   "DRAM incl. modules": "dram_hbm"
@@ -208,6 +256,12 @@ function tooltipText(label, rows) {
   return `${label}\n${rows.map((row) => `${row.name}: ${row.value}`).join("\n")}`;
 }
 
+function shouldShowXAxisLabel(labels, index) {
+  if (labels.length <= 10) return true;
+  if (index === 0 || index === labels.length - 1) return true;
+  return index % 2 === 0;
+}
+
 function chartSvg({ series, labels, formatter, height = 360, chartType = "line", selectedLabel = null }) {
   if (!series.length || !series.some((item) => item.points.length)) {
     return `<div class="chart-empty">暂无可用数据</div>`;
@@ -235,7 +289,7 @@ function chartSvg({ series, labels, formatter, height = 360, chartType = "line",
 
   const xLabels = labels
     .map((label, index) => {
-      if (labels.length > 10 && index % 2) return "";
+      if (!shouldShowXAxisLabel(labels, index)) return "";
       return `<text x="${scaleX(index)}" y="${height - 12}" text-anchor="middle">${label}</text>`;
     })
     .join("");
@@ -345,6 +399,12 @@ function amountGrowthDualAxisSvg({ points, labels, metric, selectedLabel = null,
   const plotHeight = height - padding.top - padding.bottom;
   const count = Math.max(points.length, 1);
   const scaleX = (index) => padding.left + (count === 1 ? plotWidth / 2 : (plotWidth / (count - 1)) * index);
+  const barWidth = Math.min(34, plotWidth / Math.max(count, 1) * 0.44);
+  const barScaleX = (index) => {
+    const start = padding.left + barWidth / 2;
+    const end = width - padding.right - barWidth / 2;
+    return count === 1 ? padding.left + plotWidth / 2 : start + ((end - start) / (count - 1)) * index;
+  };
 
   const metricMax = Math.max(...points.map((point) => point.value).filter(Number.isFinite), 1);
   const metricScaleMax = metricMax * 1.08;
@@ -371,14 +431,13 @@ function amountGrowthDualAxisSvg({ points, labels, metric, selectedLabel = null,
     .join("");
   const xLabels = labels
     .map((label, index) => {
-      if (labels.length > 10 && index % 2) return "";
+      if (!shouldShowXAxisLabel(labels, index)) return "";
       return `<text x="${scaleX(index)}" y="${height - 12}" text-anchor="middle">${escapeHtml(label)}</text>`;
     })
     .join("");
-  const barWidth = Math.min(34, plotWidth / Math.max(count, 1) * 0.44);
   const bars = points
     .map((point, index) => {
-      const x = scaleX(index) - barWidth / 2;
+      const x = barScaleX(index) - barWidth / 2;
       const y = metricScaleY(point.value);
       return `<rect class="amount-bar" x="${x}" y="${y}" width="${barWidth}" height="${height - padding.bottom - y}" rx="4" fill="#dbe3dc"></rect>`;
     })
@@ -485,11 +544,13 @@ function monthlyPointsForProduct(productKey) {
 
 function monthlyChartCard(segment) {
   const points = monthlyPointsForProduct(segment.productKey);
+  const latest = points.at(-1);
   return `<section class="flat-chart-card" data-segment="${segment.key}">
     <div class="flat-chart-head">
       <span>${escapeHtml(segment.label)} 月度 HS</span>
       <code>${escapeHtml(segment.hsCode)}</code>
     </div>
+    <p class="chart-inline-note">5月官方HS细分还没发布；这条 HS 明细最新到 ${escapeHtml(latest?.periodLabel ?? "--")}。</p>
     ${amountGrowthDualAxisSvg({
       points,
       labels: points.map((point) => point.period),
@@ -497,6 +558,48 @@ function monthlyChartCard(segment) {
       selectedLabel: state.selectedPeriod,
       height: 320
     })}
+  </section>`;
+}
+
+function officialMonthlyBridgeCard() {
+  const monthlyOfficial = state.data.officialMonthly ?? [];
+  const points = monthlyOfficial.slice(-6);
+  const latest = points.at(-1);
+  const tail = (state.data.preliminary ?? []).find((point) => point.period === "2026.05-21~31");
+  const labels = points.map((point) => point.period);
+  const series = [
+    {
+      name: "半导体月度总出口",
+      color: colors.semiconductor,
+      points: points.map((point) => ({
+        label: point.periodLabel,
+        value: point.valueUsd,
+        sourceName: point.sourceName,
+        sourceUrl: point.sourceUrl
+      }))
+    }
+  ];
+  return `<section class="may-bridge-card">
+    <div class="may-bridge-copy">
+      <span>半导体总量月度口径 · 已到 2026.05</span>
+      <h3>5 月全月半导体出口 ${compactUsd(latest?.valueUsd ?? 0)}</h3>
+      <p>这条线是韩国半导体总出口，不是 SSD、DRAM/HBM 或 NAND 的 HS 细分。5 月按 HS 的金额、净重和单位价值还没在 KCS TradeData 放出，所以官方细分图仍只能画到 2026.04。</p>
+      <dl>
+        <div><dt>YoY</dt><dd class="${deltaClassFromValue(latest?.valueYoYPct)}">${formatPct(latest?.valueYoYPct)}</dd></div>
+        <div><dt>总出口</dt><dd>${compactUsd(latest?.overallExportValueUsd ?? 0)}</dd></div>
+        <div><dt>尾段估算</dt><dd>${compactUsd(tail?.valueUsd ?? 0)}</dd></div>
+      </dl>
+      <a class="memory-source-link" href="${escapeHtml(latest?.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">${escapeHtml(latest?.sourceName ?? "source")}</a>
+    </div>
+    <div class="may-bridge-chart">
+      ${chartSvg({
+        series,
+        labels,
+        formatter: compactUsd,
+        height: 250,
+        chartType: "line"
+      })}
+    </div>
   </section>`;
 }
 
@@ -514,7 +617,16 @@ function nandChartCard() {
 function renderSummary() {
   const grid = document.querySelector("#summaryGrid");
   const activeSegment = displaySegmentForCategory(selectedMemoryItem()?.category);
-  grid.innerHTML = displaySegments
+  const scopeCard = `<article class="summary-card scope-card">
+    <div class="card-head">
+      <span>页面口径</span>
+      <code>别混用</code>
+    </div>
+    <div class="metric-label">现在有三层数据</div>
+    <strong>5月官方HS细分未发布</strong>
+    <p class="card-freshness">顶部三张 DRAM/SSD/NAND 卡是 5 月前 20 日细分暂估，不是官方月度 HS；中间 DRAM/SSD 图是官方 HS 月度明细，最新只能到 2026.04；5 月全月只在“半导体总量月度口径”里展示。</p>
+  </article>`;
+  grid.innerHTML = scopeCard + displaySegments
     .map((segment) => {
       const memoryItem = (state.data.memoryDetail ?? []).find((item) => item.category === segment.category);
       const valuePct = memoryItem?.exportValueMoMPct;
@@ -670,10 +782,27 @@ function renderTaiwanDemand() {
   const allPeriods = demand.monthly.map((point) => point.period).sort();
   document.querySelector("#taiwanDemandCoverage").textContent = `最新：${allPeriods.at(-1)?.replace(".", "-") ?? "--"} · 官方公开数据`;
   document.querySelector("#taiwanDemandMethod").textContent =
-    demand.meta?.notes?.join(" ") ??
-    "韩国→台湾使用台湾进口端代理指标；日本→台湾 SSD 使用日本出口端 HS 852351000。";
+    "这块现在显示的是已落库的代理/辅助序列；朋友指出的台湾正码是 85423200234（进口DRAM/HBM）和 84715000003（出口处理单元），下方已单独列出来源入口和用途边界。";
+  document.querySelector("#taiwanHsGuide").innerHTML = taiwanHsGuide.map(taiwanHsCard).join("");
   document.querySelector("#taiwanDemandGrid").innerHTML = demand.routes.map(taiwanDemandCard).join("");
   bindChartInteractions(document.querySelector("#taiwanDemandGrid"));
+}
+
+function taiwanHsCard(item) {
+  return `<article class="taiwan-hs-card ${item.status === "已展示" ? "active" : ""}">
+    <div class="taiwan-hs-head">
+      <code>${escapeHtml(item.code)}</code>
+      <span>${escapeHtml(item.status)}</span>
+    </div>
+    <h3>${escapeHtml(item.label)}</h3>
+    <p>${escapeHtml(item.role)}</p>
+    <em>${escapeHtml(item.caveat)}</em>
+    <div class="hs-link-row">
+      ${item.links
+        .map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(link.label)}</a>`)
+        .join("")}
+    </div>
+  </article>`;
 }
 
 function renderDetails() {
@@ -719,9 +848,9 @@ function renderDetails() {
 
 function renderMainChart() {
   const hsFreshness = freshnessByKey("monthly_hs");
-  document.querySelector("#mainCoverageBadge").innerHTML = `<span>口径说明</span><strong>DRAM/SSD 月度 HS；NAND 暂估</strong><em>华尔街见闻文章对应的是下方 5 月 1-20 日暂估细分；其中 MoM 是对 4 月 1-20 日，不是对 4 月全月。</em>`;
-  document.querySelector("#mainChartTitle").textContent = `月度 HS 趋势 + NAND 暂估快照`;
-  document.querySelector("#mainChart").innerHTML = `<div class="three-chart-grid">
+  document.querySelector("#mainCoverageBadge").innerHTML = `<span>口径说明</span><strong>5月官方HS细分未发布</strong><em>DRAM/SSD 的 HS 金额、净重、单位价值最新到 2026.04；5 月前 20 日存储细分来自暂估表，不是连续月度 HS。${escapeHtml(hsFreshness?.note ?? "")}</em>`;
+  document.querySelector("#mainChartTitle").textContent = `5月总量已发布；官方HS细分仍到4月`;
+  document.querySelector("#mainChart").innerHTML = `${officialMonthlyBridgeCard()}<div class="three-chart-grid">
     ${monthlyChartCard(displaySegments[0])}
     ${monthlyChartCard(displaySegments[1])}
     ${nandChartCard()}

@@ -1,21 +1,28 @@
 name = "memory-export-tracker"
 main = "workers/memory-export-worker.js"
 compatibility_date = "2026-05-23"
+compatibility_flags = ["nodejs_compat"]
 
 [assets]
 directory = "./public"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+run_worker_first = ["/api/*", "/mcp", "/data/trade-data.json"]
 
 [[kv_namespaces]]
 binding = "MEMORY_EXPORT_KV"
 id = "36ff6e93a29e414fa78ede3111909076"
 
 [triggers]
-crons = ["35 6 * * *"]
+# Release-window refreshes at 15:45 KST / 14:45 China time:
+# 1-3: monthly total export release window.
+# 11-13: first-10-day provisional release window.
+# 15-17: prior-month final/monthly HS detail release window.
+# 21-23: first-20-day provisional release window.
+crons = ["45 6 1-3,11-13,15-17,21-23 * *"]
 
 [vars]
-GITHUB_OWNER = "WilsonWang01"
+GITHUB_OWNER = "chenzixin1"
 GITHUB_REPO = "memory-export-tracker"
 GITHUB_WORKFLOW_ID = "update-memory-export-kv.yml"
 GITHUB_REF = "main"

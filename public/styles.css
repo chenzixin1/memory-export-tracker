@@ -63,6 +63,22 @@ button {
   justify-content: space-between;
 }
 
+.chart-toolbar > div:last-child {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+}
+
+.metric-scope-note {
+  max-width: 23rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 820;
+  line-height: 1.35;
+  text-align: right;
+}
+
 .topbar {
   align-items: flex-end;
   gap: 24px;
@@ -110,7 +126,8 @@ h2 {
 .segmented,
 .method-strip,
 .memory-detail-panel,
-.taiwan-demand-panel {
+.taiwan-demand-panel,
+.api-access-panel {
   border: 1px solid var(--line);
   background: color-mix(in oklch, var(--paper) 92%, white);
   box-shadow: var(--shadow);
@@ -335,7 +352,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(250px, 0.82fr) repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 14px;
 }
@@ -380,6 +397,27 @@ h2 {
 
 .summary-card.active {
   background: color-mix(in oklch, var(--paper) 88%, white);
+}
+
+.summary-card.scope-card {
+  cursor: default;
+  border-style: dashed;
+  background: color-mix(in oklch, var(--paper-strong) 88%, #dbe3dc);
+}
+
+.summary-card.scope-card::before {
+  background: var(--ink);
+}
+
+.summary-card.scope-card:hover {
+  border-color: var(--line);
+  transform: none;
+  box-shadow: none;
+}
+
+.summary-card.scope-card strong {
+  font-size: clamp(1.2rem, 1.9vw, 1.72rem);
+  line-height: 1.12;
 }
 
 .card-head span {
@@ -887,6 +925,206 @@ dd {
   margin-bottom: 14px;
 }
 
+.api-access-panel {
+  display: grid;
+  gap: 13px;
+  margin-bottom: 14px;
+}
+
+.api-access-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(260px, 0.9fr) minmax(260px, 0.9fr);
+  gap: 12px;
+}
+
+.api-access-card {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper-strong);
+}
+
+.api-access-card.primary {
+  border-color: color-mix(in oklch, var(--teal) 32%, var(--line));
+}
+
+.api-access-card > span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.api-access-card > code {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: color-mix(in oklch, var(--paper) 78%, white);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.api-access-card p {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.api-access-card pre {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #161a1d;
+}
+
+.api-access-card pre code {
+  color: #f7faf4;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.api-link-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.api-link-list li {
+  min-width: 0;
+}
+
+.api-link-list a,
+.api-link-list.compact code {
+  display: block;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: color-mix(in oklch, var(--paper) 78%, white);
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.api-link-list a:hover {
+  border-color: var(--line-strong);
+}
+
+.taiwan-hs-guide {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.taiwan-hs-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--paper) 78%, white);
+}
+
+.taiwan-hs-card:nth-child(1),
+.taiwan-hs-card:nth-child(2) {
+  border-color: color-mix(in oklch, var(--good) 28%, var(--line));
+  background: color-mix(in oklch, var(--good) 5%, var(--paper));
+}
+
+.taiwan-hs-card.active {
+  border-color: color-mix(in oklch, var(--blue) 28%, var(--line));
+  background: color-mix(in oklch, var(--blue) 5%, var(--paper));
+}
+
+.taiwan-hs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.taiwan-hs-head code {
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.taiwan-hs-head span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.taiwan-hs-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.18;
+}
+
+.taiwan-hs-card p,
+.taiwan-hs-card em {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.taiwan-hs-card em {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.hs-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.hs-link-row a {
+  min-height: 28px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 850;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.hs-link-row a:hover {
+  border-color: var(--line-strong);
+}
+
 .taiwan-demand-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1112,6 +1350,101 @@ dd {
   justify-self: start;
 }
 
+.may-bridge-card {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.62fr) minmax(420px, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--paper-strong) 86%, white);
+}
+
+.may-bridge-copy {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+
+.may-bridge-copy span,
+.chart-inline-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.may-bridge-copy span {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.may-bridge-copy h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.3rem, 2.2vw, 2.05rem);
+  line-height: 1.08;
+}
+
+.may-bridge-copy p,
+.chart-inline-note {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.may-bridge-copy p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 720;
+}
+
+.may-bridge-copy dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.may-bridge-copy dl div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+}
+
+.may-bridge-copy dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.may-bridge-copy dd {
+  margin: 0;
+  color: var(--ink);
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.may-bridge-copy dd.positive {
+  color: var(--good);
+}
+
+.may-bridge-copy dd.negative {
+  color: var(--bad);
+}
+
+.may-bridge-chart {
+  min-width: 0;
+}
+
+.chart-inline-note {
+  padding: 0 2px 4px;
+}
+
 .legend {
   flex-wrap: wrap;
   margin-top: 8px;
@@ -1300,6 +1633,12 @@ svg text {
     align-items: stretch;
   }
 
+  .chart-toolbar > div:last-child,
+  .metric-scope-note {
+    justify-items: start;
+    text-align: left;
+  }
+
   .actions {
     justify-content: space-between;
   }
@@ -1307,8 +1646,11 @@ svg text {
   .status-strip,
   .summary-grid,
   .method-strip,
+  .may-bridge-card,
   .memory-detail-focus,
   .memory-detail-grid,
+  .taiwan-hs-guide,
+  .api-access-grid,
   .taiwan-demand-grid,
   .three-chart-grid,
   .chart-control-strip,
@@ -1362,6 +1704,11 @@ svg text {
 
   .memory-focus-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .taiwan-hs-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .taiwan-route-head {

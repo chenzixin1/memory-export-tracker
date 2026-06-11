@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>韩国存储出口量价台</title>
-    <link rel="stylesheet" href="styles.css?v=20260524-taiwan-demand" />
+    <link rel="stylesheet" href="styles.css?v=20260601-hs-pending" />
   </head>
   <body>
     <main class="screen">
@@ -27,7 +27,7 @@
       <section class="method-strip" aria-label="dashboard tracking method">
         <div>
           <span class="method-label">追踪口径</span>
-          <strong>SSD 8523.51 · DRAM/HBM 8542.32</strong>
+          <strong>韩国出口：SSD 8523.51 · Memory 8542.32</strong>
         </div>
         <div>
           <span class="method-label">量价拆分</span>
@@ -35,7 +35,7 @@
         </div>
         <div>
           <span class="method-label">更新节奏</span>
-          <strong>月度最终值 + 10 日高频窗口</strong>
+          <strong>5月官方HS细分未发布；总量已到5月</strong>
         </div>
       </section>
 
@@ -72,6 +72,7 @@
               <button data-metric="valueUsd">出口金额</button>
               <button data-metric="weightKg">出口净重</button>
             </div>
+            <p class="metric-scope-note">这些按钮只切换下方 DRAM/SSD 的 HS 明细图，不切换 5 月半导体总量卡。</p>
           </div>
           <div class="chart-control-strip" aria-label="dashboard controls">
             <div class="control-group">
@@ -114,12 +115,59 @@
         <div class="section-head">
           <div>
             <p class="panel-title">TAIWAN AI PULL-DEMAND</p>
-            <h2>台湾拉货链条：韩国存储代理 + 日本 SSD</h2>
+            <h2>台湾链条口径：当前代理 + 待补正码</h2>
           </div>
           <span id="taiwanDemandCoverage" class="freshness-note"></span>
         </div>
         <p id="taiwanDemandMethod" class="method-note"></p>
+        <div id="taiwanHsGuide" class="taiwan-hs-guide"></div>
         <div id="taiwanDemandGrid" class="taiwan-demand-grid"></div>
+      </section>
+
+      <section class="chart-panel api-access-panel">
+        <div class="section-head">
+          <div>
+            <p class="panel-title">API / MCP ACCESS</p>
+            <h2>给模型和脚本调用的数据入口</h2>
+          </div>
+          <span class="freshness-note">公开只读接口 · 不暴露刷新权限</span>
+        </div>
+        <div class="api-access-grid">
+          <article class="api-access-card primary">
+            <span>REST base</span>
+            <code>https://memory-export.chenzixin.uk</code>
+            <p>用于脚本、看板、Notebook 或其他服务直接读取 JSON。</p>
+            <pre><code>curl "https://memory-export.chenzixin.uk/api/data/monthly?product=dram_hbm&amp;range=12"</code></pre>
+          </article>
+          <article class="api-access-card">
+            <span>MCP endpoint</span>
+            <code>https://memory-export.chenzixin.uk/mcp</code>
+            <p>用于支持远程 MCP 的客户端读取同一份数据。当前为公开只读，不包含更新/发布工具。</p>
+            <pre><code>npx mcp-remote https://memory-export.chenzixin.uk/mcp</code></pre>
+          </article>
+          <article class="api-access-card">
+            <span>REST endpoints</span>
+            <ul class="api-link-list">
+              <li><a href="/api/data/catalog">/api/data/catalog</a></li>
+              <li><a href="/api/data/overview">/api/data/overview</a></li>
+              <li><a href="/api/data/monthly?product=ssd&amp;range=12">/api/data/monthly</a></li>
+              <li><a href="/api/data/memory-detail?category=SSD">/api/data/memory-detail</a></li>
+              <li><a href="/api/data/taiwan-routes?route=korea_to_taiwan_electrical">/api/data/taiwan-routes</a></li>
+              <li><a href="/api/data/sources">/api/data/sources</a></li>
+            </ul>
+          </article>
+          <article class="api-access-card">
+            <span>MCP tools</span>
+            <ul class="api-link-list compact">
+              <li><code>list_data_endpoints</code></li>
+              <li><code>get_dashboard_overview</code></li>
+              <li><code>get_monthly_series</code></li>
+              <li><code>get_memory_detail</code></li>
+              <li><code>get_taiwan_routes</code></li>
+              <li><code>get_source_registry</code></li>
+            </ul>
+          </article>
+        </div>
       </section>
 
       <section class="lower-grid">
@@ -140,6 +188,6 @@
       </section>
     </main>
     <div id="chartTooltip" class="chart-tooltip" hidden></div>
-    <script src="app.js?v=20260524-taiwan-demand" type="module"></script>
+    <script src="app.js?v=20260601-hs-pending" type="module"></script>
   </body>
 </html>

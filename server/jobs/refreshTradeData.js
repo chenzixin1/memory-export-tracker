@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { productConfigs } from "../config.js";
 import { fetchMonthlyProductSeries } from "../koreaTradeClient.js";
 import { buildSampleStore } from "../sampleData.js";
@@ -35,7 +37,7 @@ export async function refreshTradeData() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   refreshTradeData()
     .then((store) => {
       console.log(`[refresh] ${store.meta.mode}: ${store.monthly.length} monthly points`);

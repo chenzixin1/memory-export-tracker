@@ -1,3 +1,6 @@
+import { handleDataApi } from "../shared/data-api.js";
+import { serveMemoryExportMcp } from "./mcp-server.js";
+
 const DATA_KEY = "trade-data/latest.json";
 const STATUS_KEY = "trade-data/status.json";
 const HISTORY_PREFIX = "trade-data/history/";
@@ -12,6 +15,17 @@ export default {
 
     if (url.pathname === "/api/dashboard" || url.pathname === "/data/trade-data.json") {
       return serveTradeData(request, env);
+    }
+
+    if (url.pathname === "/mcp") {
+      return serveMemoryExportMcp(request, env, ctx, () => readTradeDataPayload(request, env));
+    }
+
+    if (url.pathname === "/api/data" || url.pathname.startsWith("/api/data/")) {
+      const payload = await readTradeDataPayload(request, env);
+      const result = handleDataApi(url.pathname, url.searchParams, payload);
+      if (!result) return json({ error: "Unknown data API endpoint.", catalogUrl: "/api/data/catalog" }, 404);
+      return json(result.data);
     }
 
     if (url.pathname === "/api/memory-export-update/status") {
@@ -49,21 +63,8 @@ export default {
 };
 
 async function serveTradeData(request, env) {
-  const body = await env.MEMORY_EXPORT_KV.get(DATA_KEY);
+  const body = await readTradeDataBody(request, env);
   if (body) return dataResponse(body);
-
-  const assetUrl = new URL("/data/trade-data.json", request.url);
-  const fallback = await env.ASSETS.fetch(new Request(assetUrl, request));
-  if (fallback.ok) {
-    return new Response(fallback.body, {
-      status: fallback.status,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "public, max-age=120, stale-while-revalidate=600",
-        "access-control-allow-origin": "*"
-      }
-    });
-  }
 
   return json(
     {
@@ -72,6 +73,27 @@ async function serveTradeData(request, env) {
     },
     503
   );
+}
+
+async function readTradeDataPayload(request, env) {
+  const body = await readTradeDataBody(request, env);
+  if (!body) {
+    throw new Error("Trade data has not been published yet.");
+  }
+  return JSON.parse(body);
+}
+
+async function readTradeDataBody(request, env) {
+  const body = await env.MEMORY_EXPORT_KV.get(DATA_KEY);
+  if (body) return body;
+
+  const assetUrl = new URL("/data/trade-data.json", request.url);
+  const fallback = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: "GET" }));
+  if (fallback.ok) {
+    return await fallback.text();
+  }
+
+  return null;
 }
 
 async function serveStatus(env) {

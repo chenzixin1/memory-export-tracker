@@ -4,6 +4,7 @@ import path from "node:path";
 import { env, paths } from "./config.js";
 import { refreshTradeData } from "./jobs/refreshTradeData.js";
 import { readStore } from "./storage.js";
+import { handleDataApi } from "../shared/data-api.js";
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -41,17 +42,29 @@ async function serveStatic(request, response) {
 
 async function handleRequest(request, response) {
   try {
+    const url = new URL(request.url, `http://${request.headers.host}`);
+
     if (request.method === "GET" && request.url === "/api/health") {
       json(response, 200, { ok: true, now: new Date().toISOString() });
       return;
     }
 
-    if (request.method === "GET" && new URL(request.url, `http://${request.headers.host}`).pathname === "/api/dashboard") {
+    if (request.method === "GET" && url.pathname === "/api/dashboard") {
       json(response, 200, await readStore());
       return;
     }
 
-    if (request.method === "POST" && new URL(request.url, `http://${request.headers.host}`).pathname === "/api/refresh") {
+    if (request.method === "GET" && (url.pathname === "/api/data" || url.pathname.startsWith("/api/data/"))) {
+      const result = handleDataApi(url.pathname, url.searchParams, await readStore());
+      if (!result) {
+        json(response, 404, { error: "Unknown data API endpoint.", catalogUrl: "/api/data/catalog" });
+        return;
+      }
+      json(response, 200, result.data);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/refresh") {
       json(response, 200, await refreshTradeData());
       return;
     }
