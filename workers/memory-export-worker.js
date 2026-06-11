@@ -35,7 +35,7 @@ export default {
     if (url.pathname === "/api/memory-export-update/run") {
       if (!isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
       const dispatched = await dispatchWorkflow(env, { reason: "manual" });
-      ctx.waitUntil(writeStatus(env, dispatched));
+      await writeStatus(env, dispatched);
       return json(dispatched, dispatched.ok ? 202 : 502);
     }
 
@@ -50,7 +50,7 @@ export default {
     if (url.pathname === "/api/refresh") {
       if (!isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
       const dispatched = await dispatchWorkflow(env, { reason: "manual-refresh" });
-      ctx.waitUntil(writeStatus(env, dispatched));
+      await writeStatus(env, dispatched);
       return json(dispatched, dispatched.ok ? 202 : 502);
     }
 
@@ -225,7 +225,20 @@ function failPublish(startedAt, error) {
 }
 
 async function writeStatus(env, status) {
+  if (status.phase === "dispatch") {
+    const current = await readStatusPayload(env);
+    if (current?.phase === "publish" && current.startedAt && current.startedAt >= status.startedAt) return;
+  }
   await env.MEMORY_EXPORT_KV.put(STATUS_KEY, `${JSON.stringify(status, null, 2)}\n`);
+}
+
+async function readStatusPayload(env) {
+  try {
+    const body = await env.MEMORY_EXPORT_KV.get(STATUS_KEY);
+    return body ? JSON.parse(body) : null;
+  } catch {
+    return null;
+  }
 }
 
 function isAuthorized(request, env) {
