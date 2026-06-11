@@ -43,7 +43,7 @@ export default {
       if (!isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
       if (request.method !== "POST") return json({ error: "POST required" }, 405);
       const published = await publishTradeData(request, env);
-      ctx.waitUntil(writeStatus(env, published));
+      await writeStatus(env, published);
       return json(published, published.ok ? 200 : 400);
     }
 
