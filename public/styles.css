@@ -658,7 +658,7 @@ dd {
 }
 
 .prelim-panel .chart-frame.small {
-  min-height: 470px;
+  min-height: 500px;
 }
 
 .three-chart-grid {
@@ -1233,6 +1233,16 @@ dd {
 
 .prelim-panel {
   grid-column: 1 / -1;
+}
+
+.stacked-legend {
+  flex-wrap: wrap;
+}
+
+.stacked-legend .line-key {
+  height: 3px;
+  border-radius: 999px;
+  transform: translateY(-1px);
 }
 
 .lower-grid > .chart-panel {

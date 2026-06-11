@@ -366,7 +366,14 @@ const preliminaryStackSegments = [
   { key: "first10", label: "1-10日", color: "#8f4f19" },
   { key: "secondTen", label: "11-20日", color: "#c47a2e" },
   { key: "combinedFirstTwenty", label: "1-20日累计（未拆）", color: "#9a7b62", pattern: true },
-  { key: "tail", label: "21-月末", color: "#e0ad6f" }
+  { key: "tail", label: "21-月末", color: "#e0ad6f" },
+  { key: "unallocated", label: "全月未拆余量", color: "#d7dde0", pattern: true }
+];
+
+const preliminaryMomSeries = [
+  { key: "first10MoM", valueKey: "first10", label: "1-10日 MoM", color: "#315f9d" },
+  { key: "secondTenMoM", valueKey: "secondTen", label: "11-20日 MoM", color: "#15756b", dash: "6 5" },
+  { key: "tailMoM", valueKey: "tail", label: "21-月末 MoM", color: "#a8601f" }
 ];
 
 function monthLabelFromPeriod(period) {
@@ -387,6 +394,7 @@ function preliminaryMonthBreakdown() {
         secondTen: null,
         tail: null,
         full: null,
+        fullYoYPct: null,
         combinedFirstTwenty: null,
         sources: []
       });
@@ -401,17 +409,19 @@ function preliminaryMonthBreakdown() {
     if (point.period.endsWith("-1~20")) month.first20 = point.valueUsd;
     if (point.period.includes("-21~")) month.tail = point.valueUsd;
     if (point.period.endsWith("-1~31")) month.full = point.valueUsd;
+    if (point.period.endsWith("-1~31") && Number.isFinite(point.valueYoYPct)) month.fullYoYPct = point.valueYoYPct;
   });
 
   (state.data.officialMonthly ?? []).forEach((point) => {
-    const month = months.get(point.period);
-    if (month && !month.full) {
+    const month = ensureMonth(point.period);
+    if (!month.full) {
       month.full = point.valueUsd;
-      month.sources.push(point);
     }
+    if (Number.isFinite(point.valueYoYPct)) month.fullYoYPct = point.valueYoYPct;
+    month.sources.push(point);
   });
 
-  return [...months.values()]
+  const sorted = [...months.values()]
     .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
     .map((month) => {
       const first10 = Number.isFinite(month.first10) ? month.first10 : null;
@@ -424,33 +434,53 @@ function preliminaryMonthBreakdown() {
           : Number.isFinite(month.full) && Number.isFinite(month.first20)
             ? Math.max(month.full - month.first20, 0)
             : null;
-      const knownTotal = [first10, secondTen, tail, combinedFirstTwenty].filter(Number.isFinite).reduce((sum, value) => sum + value, 0);
+      const explicitTotal = [first10, secondTen, tail, combinedFirstTwenty].filter(Number.isFinite).reduce((sum, value) => sum + value, 0);
+      const unallocated =
+        Number.isFinite(month.full) && month.full > explicitTotal ? Math.max(month.full - explicitTotal, 0) : null;
+      const knownTotal = Number.isFinite(month.full) ? Math.max(month.full, explicitTotal) : explicitTotal;
       return {
         ...month,
         first10,
         secondTen,
         tail,
         combinedFirstTwenty,
+        unallocated,
         knownTotal,
         complete: Number.isFinite(first10) && Number.isFinite(secondTen) && Number.isFinite(tail),
+        isCompleteMonth: Number.isFinite(month.full),
         sourceUrl: month.sources.at(-1)?.sourceUrl ?? "#",
         sourceName: month.sources.at(-1)?.sourceName ?? "source"
       };
     });
+
+  const visible = sorted.slice(-12);
+  visible.forEach((month, index) => {
+    const previous = visible[index - 1];
+    preliminaryMomSeries.forEach((series) => {
+      month[series.key] = previous ? percentChangeValue(month[series.valueKey], previous[series.valueKey]) : null;
+    });
+  });
+  return visible;
 }
 
 function stackedSemiconductorSvg(months, height = 430) {
   if (!months.length) return `<div class="chart-empty">暂无可用数据</div>`;
 
   const width = 1120;
-  const padding = { top: 30, right: 28, bottom: 58, left: 82 };
+  const padding = { top: 34, right: 92, bottom: 64, left: 82 };
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
   const max = Math.max(...months.map((month) => month.knownTotal), 1) * 1.12;
   const scaleY = (value) => padding.top + plotHeight - (value / max) * plotHeight;
   const scaleX = (index) => padding.left + (months.length === 1 ? plotWidth / 2 : (plotWidth / (months.length - 1)) * index);
-  const barWidth = Math.min(104, plotWidth / Math.max(months.length, 1) * 0.58);
+  const barWidth = Math.min(68, plotWidth / Math.max(months.length, 1) * 0.52);
   const ticks = Array.from({ length: 5 }, (_, index) => (max / 4) * index);
+  const momValues = months.flatMap((month) => preliminaryMomSeries.map((series) => month[series.key])).filter(Number.isFinite);
+  const momExtent = Math.max(...momValues.map((value) => Math.abs(value)), 10);
+  const momMax = Math.ceil(momExtent / 10) * 10;
+  const momMin = -momMax;
+  const scaleRightY = (value) => padding.top + plotHeight - ((value - momMin) / (momMax - momMin)) * plotHeight;
+  const rightTicks = [-momMax, -momMax / 2, 0, momMax / 2, momMax];
 
   const grid = ticks
     .map((tick) => {
@@ -465,7 +495,18 @@ function stackedSemiconductorSvg(months, height = 430) {
       <rect width="8" height="8" fill="#9a7b62"></rect>
       <rect width="3" height="8" fill="#d6c8b8" opacity="0.55"></rect>
     </pattern>
+    <pattern id="unallocated-monthly" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#d7dde0"></rect>
+      <rect width="3" height="8" fill="#eef2f3" opacity="0.7"></rect>
+    </pattern>
   </defs>`;
+
+  const rightAxis = rightTicks
+    .map((tick) => {
+      const y = scaleRightY(tick);
+      return `<text x="${width - padding.right + 10}" y="${y + 4}" text-anchor="start">${formatPct(tick)}</text>`;
+    })
+    .join("");
 
   const bars = months
     .map((month, index) => {
@@ -477,7 +518,12 @@ function stackedSemiconductorSvg(months, height = 430) {
           if (!Number.isFinite(value) || value <= 0) return "";
           const segmentHeight = height - padding.bottom - scaleY(value);
           cursor -= segmentHeight;
-          const fill = segment.pattern ? "url(#combined-first-twenty)" : segment.color;
+          const fill =
+            segment.key === "combinedFirstTwenty"
+              ? "url(#combined-first-twenty)"
+              : segment.key === "unallocated"
+                ? "url(#unallocated-monthly)"
+                : segment.color;
           return `<rect class="stack-segment" x="${x}" y="${cursor}" width="${barWidth}" height="${segmentHeight}" fill="${fill}"></rect>`;
         })
         .join("");
@@ -488,6 +534,10 @@ function stackedSemiconductorSvg(months, height = 430) {
         })
         .filter(Boolean);
       if (!month.complete) rows.push({ color: "#6b7280", name: "覆盖", value: "公开源未完整拆分" });
+      preliminaryMomSeries.forEach((series) => {
+        rows.push({ color: series.color, name: series.label, value: formatChange(month[series.key]) });
+      });
+      if (Number.isFinite(month.fullYoYPct)) rows.push({ color: "#111827", name: "完整月 YoY", value: formatChange(month.fullYoYPct) });
       const tooltip = tooltipHtml(month.monthLabel, rows);
       const title = tooltipText(month.monthLabel, rows);
       return `${segmentRects}
@@ -497,23 +547,46 @@ function stackedSemiconductorSvg(months, height = 430) {
     .join("");
 
   const xLabels = months
-    .map((month, index) => `<text x="${scaleX(index)}" y="${height - 18}" text-anchor="middle">${escapeHtml(month.monthLabel.replace("2026年", ""))}</text>`)
+    .map((month, index) => {
+      const [year, rawMonth] = month.monthKey.split(".");
+      return `<text x="${scaleX(index)}" y="${height - 20}" text-anchor="middle">${escapeHtml(`${year.slice(2)}.${Number(rawMonth)}`)}</text>`;
+    })
+    .join("");
+  const momLines = preliminaryMomSeries
+    .map((series) =>
+      lineSegments(
+        months.map((month) => ({
+          value: month[series.key],
+          color: series.color,
+          dash: series.dash
+        })),
+        scaleX,
+        scaleRightY,
+        { showSingles: false }
+      )
+    )
     .join("");
   const legend = `<div class="legend stacked-legend">${preliminaryStackSegments
     .map((segment) => `<span><i style="background:${segment.pattern ? "#9a7b62" : segment.color}"></i>${segment.label}</span>`)
+    .join("")}${preliminaryMomSeries
+    .map((series) => `<span><i class="line-key" style="background:${series.color}"></i>${series.label}</span>`)
     .join("")}</div>`;
 
   return `<svg class="stacked-prelim-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="半导体旬度拆解堆叠柱状图">
       ${defs}
       ${grid}
       <text class="axis-label" x="${padding.left}" y="16" text-anchor="start">半导体出口金额</text>
+      <text class="axis-label" x="${width - padding.right}" y="16" text-anchor="end">同旬段 MoM</text>
       <line class="axis" x1="${padding.left}" x2="${width - padding.right}" y1="${height - padding.bottom}" y2="${height - padding.bottom}"></line>
+      <line class="axis" x1="${width - padding.right}" x2="${width - padding.right}" y1="${padding.top}" y2="${height - padding.bottom}"></line>
+      ${rightAxis}
       ${xLabels}
       ${bars}
+      ${momLines}
     </svg>${legend}`;
 }
 
-function lineSegments(points, scaleX, scaleY) {
+function lineSegments(points, scaleX, scaleY, { showSingles = true } = {}) {
   const segments = [];
   let current = [];
   points.forEach((point, index) => {
@@ -528,6 +601,7 @@ function lineSegments(points, scaleX, scaleY) {
   return segments
     .map((segment) => {
       if (segment.length === 1) {
+        if (!showSingles) return "";
         const point = segment[0];
         return `<circle cx="${scaleX(point.index)}" cy="${scaleY(point.value)}" r="3.5" fill="#fff" stroke="${point.color}" stroke-width="2"></circle>`;
       }
@@ -1050,7 +1124,9 @@ function renderPrelimChart() {
   const monthlyOfficial = state.data.officialMonthly ?? [];
   const latestPreliminary = state.data.preliminary?.at(-1);
   const stackedMonths = preliminaryMonthBreakdown();
+  const latestCompleteMonth = [...stackedMonths].reverse().find((month) => Number.isFinite(month.fullYoYPct));
   const monthlyCards = monthlyOfficial
+    .slice(-4)
     .map(
       (point) => `<a href="${escapeHtml(point.sourceUrl)}" target="_blank" rel="noreferrer">
         <span>${escapeHtml(point.periodLabel)}</span>
@@ -1069,16 +1145,16 @@ function renderPrelimChart() {
   document.querySelector("#monthlyOfficial").innerHTML = monthlyCards + latestPreliminaryCard;
   const latest = latestPreliminary;
   document.querySelector("#prelimCaption").textContent = latest?.sourceName
-    ? `最新：${latest.periodLabel} 累计半导体出口 ${compactUsd(latest.valueUsd)}。每个月一根柱，尽量拆成 1-10 日、11-20 日、21-月末；1/2 月当前公开库只有 1-20 日累计，6 月当前只有 1-10 日。`
+    ? `最近12个月：柱为半导体出口旬段金额，缺公开拆分时才用灰色标识余量；右轴三条线分别是 1-10日、11-20日、21-月末 MoM。最新完整月 ${latestCompleteMonth?.monthLabel ?? "n/a"} YoY ${formatChange(latestCompleteMonth?.fullYoYPct)}。`
     : "用于观察 KCS 旬度简报口径下的半导体出口节奏。";
   document.querySelector("#prelimChart").innerHTML = stackedSemiconductorSvg(stackedMonths, 430);
   document.querySelector("#sourceList").innerHTML = state.data.preliminary
     ? `<div class="stacked-source-row stacked-source-head">
         <span>月份</span>
-        <em>1-10 / 1-20未拆</em>
+        <em>1-10 / 1-20</em>
         <em>11-20</em>
         <em>21-月末</em>
-        <strong>已披露合计</strong>
+        <strong>全月 / YoY</strong>
       </div>` +
       stackedMonths
         .map(
@@ -1088,7 +1164,7 @@ function renderPrelimChart() {
               <em>${Number.isFinite(month.first10) ? compactUsd(month.first10) : Number.isFinite(month.combinedFirstTwenty) ? `${compactUsd(month.combinedFirstTwenty)} 1-20累计` : "n/a"}</em>
               <em>${Number.isFinite(month.secondTen) ? compactUsd(month.secondTen) : "n/a"}</em>
               <em>${Number.isFinite(month.tail) ? compactUsd(month.tail) : "n/a"}</em>
-              <strong>${compactUsd(month.knownTotal)}</strong>
+              <strong>${compactUsd(month.knownTotal)}${Number.isFinite(month.fullYoYPct) ? ` · ${formatChange(month.fullYoYPct)}` : ""}</strong>
             </a>`
         )
         .join("")
