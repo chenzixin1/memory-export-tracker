@@ -1610,6 +1610,15 @@ svg text {
   border-color: var(--line-strong);
 }
 
+.monthly-official a.high-frequency {
+  border-color: color-mix(in oklch, var(--rust) 38%, var(--line));
+  background: color-mix(in oklch, var(--rust) 8%, var(--paper-strong));
+}
+
+.monthly-official a.high-frequency strong {
+  color: var(--rust);
+}
+
 .monthly-official span,
 .monthly-official small {
   color: var(--muted);

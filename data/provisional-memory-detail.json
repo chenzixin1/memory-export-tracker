@@ -1,7 +1,7 @@
 [
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "Memory ex-MCP (derived)",
     "exportValueUsd": 14705000000,
     "exportValueYoYPct": 450,
@@ -15,7 +15,7 @@
   },
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "DRAM incl. modules",
     "exportValueUsd": 11527000000,
     "exportValueYoYPct": 498,
@@ -29,7 +29,7 @@
   },
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "DRAM excl. modules",
     "exportValueUsd": 7488000000,
     "exportValueYoYPct": 431,
@@ -43,7 +43,7 @@
   },
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "Flash memory",
     "exportValueUsd": 954000000,
     "exportValueYoYPct": 178,
@@ -57,7 +57,7 @@
   },
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "SSD",
     "exportValueUsd": 2224000000,
     "exportValueYoYPct": 452,
@@ -72,7 +72,7 @@
   },
   {
     "period": "2026.05-1~20",
-    "periodLabel": "2026年5月前20日",
+    "periodLabel": "2026年5月1-20日",
     "category": "MCP / HBM proxy",
     "exportValueUsd": 4860000000,
     "exportValueYoYPct": null,

@@ -333,7 +333,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
     preliminary: [
       {
         period: "2026.01-1~20",
-        periodLabel: "1月前20日",
+        periodLabel: "1月1-20日",
         valueUsd: 10_732_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -347,7 +347,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.02-1~20",
-        periodLabel: "2月前20日",
+        periodLabel: "2月1-20日",
         valueUsd: 15_115_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -361,7 +361,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.03-1~10",
-        periodLabel: "3月前10日",
+        periodLabel: "3月1-10日",
         valueUsd: 7_600_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -375,7 +375,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.03-1~20",
-        periodLabel: "3月前20日",
+        periodLabel: "3月1-20日",
         valueUsd: 18_700_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -389,7 +389,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.04-1~10",
-        periodLabel: "4月前10日",
+        periodLabel: "4月1-10日",
         valueUsd: 8_600_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -403,7 +403,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.04-1~20",
-        periodLabel: "4月前20日",
+        periodLabel: "4月1-20日",
         valueUsd: 18_300_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -417,7 +417,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.05-1~10",
-        periodLabel: "5月前10日",
+        periodLabel: "5月1-10日",
         valueUsd: 8_500_000_000,
         weightKg: 0,
         unitPriceUsdPerKg: null,
@@ -431,7 +431,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.05-1~20",
-        periodLabel: "5月前20日",
+        periodLabel: "5月1-20日",
         valueUsd: 21_951_000_000,
         valueYoYPct: 202.1,
         weightKg: 0,
@@ -496,7 +496,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       },
       {
         period: "2026.06-1~10",
-        periodLabel: "6月前10日",
+        periodLabel: "6月1-10日",
         valueUsd: 11_068_000_000,
         valueYoYPct: 205.8,
         weightKg: 0,

@@ -646,7 +646,7 @@
   "memoryDetail": [
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "Memory ex-MCP (derived)",
       "exportValueUsd": 14705000000,
       "exportValueYoYPct": 450,
@@ -660,7 +660,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "DRAM incl. modules",
       "exportValueUsd": 11527000000,
       "exportValueYoYPct": 498,
@@ -674,7 +674,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "DRAM excl. modules",
       "exportValueUsd": 7488000000,
       "exportValueYoYPct": 431,
@@ -688,7 +688,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "Flash memory",
       "exportValueUsd": 954000000,
       "exportValueYoYPct": 178,
@@ -702,7 +702,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "SSD",
       "exportValueUsd": 2224000000,
       "exportValueYoYPct": 452,
@@ -717,7 +717,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "2026年5月前20日",
+      "periodLabel": "2026年5月1-20日",
       "category": "MCP / HBM proxy",
       "exportValueUsd": 4860000000,
       "exportValueYoYPct": null,
@@ -1303,7 +1303,7 @@
   "preliminary": [
     {
       "period": "2026.01-1~20",
-      "periodLabel": "1月前20日",
+      "periodLabel": "1月1-20日",
       "valueUsd": 10732000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1317,7 +1317,7 @@
     },
     {
       "period": "2026.02-1~20",
-      "periodLabel": "2月前20日",
+      "periodLabel": "2月1-20日",
       "valueUsd": 15115000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1331,7 +1331,7 @@
     },
     {
       "period": "2026.03-1~10",
-      "periodLabel": "3月前10日",
+      "periodLabel": "3月1-10日",
       "valueUsd": 7600000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1345,7 +1345,7 @@
     },
     {
       "period": "2026.03-1~20",
-      "periodLabel": "3月前20日",
+      "periodLabel": "3月1-20日",
       "valueUsd": 18700000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1359,7 +1359,7 @@
     },
     {
       "period": "2026.04-1~10",
-      "periodLabel": "4月前10日",
+      "periodLabel": "4月1-10日",
       "valueUsd": 8600000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1373,7 +1373,7 @@
     },
     {
       "period": "2026.04-1~20",
-      "periodLabel": "4月前20日",
+      "periodLabel": "4月1-20日",
       "valueUsd": 18300000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1387,7 +1387,7 @@
     },
     {
       "period": "2026.05-1~10",
-      "periodLabel": "5月前10日",
+      "periodLabel": "5月1-10日",
       "valueUsd": 8500000000,
       "weightKg": 0,
       "unitPriceUsdPerKg": null,
@@ -1401,7 +1401,7 @@
     },
     {
       "period": "2026.05-1~20",
-      "periodLabel": "5月前20日",
+      "periodLabel": "5月1-20日",
       "valueUsd": 21951000000,
       "valueYoYPct": 202.1,
       "weightKg": 0,
@@ -1465,7 +1465,7 @@
     },
     {
       "period": "2026.06-1~10",
-      "periodLabel": "6月前10日",
+      "periodLabel": "6月1-10日",
       "valueUsd": 11068000000,
       "valueYoYPct": 205.8,
       "weightKg": 0,

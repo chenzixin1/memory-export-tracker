@@ -624,7 +624,7 @@ function renderSummary() {
     </div>
     <div class="metric-label">现在有三层数据</div>
     <strong>5月官方HS细分未发布</strong>
-    <p class="card-freshness">顶部三张 DRAM/SSD/NAND 卡是 5 月前 20 日细分暂估，不是官方月度 HS；中间 DRAM/SSD 图是官方 HS 月度明细，最新只能到 2026.04；5 月全月只在“半导体总量月度口径”里展示。</p>
+    <p class="card-freshness">顶部三张 DRAM/SSD/NAND 卡是 5 月 1-20 日细分暂估，不是官方月度 HS；中间 DRAM/SSD 图是官方 HS 月度明细，最新只能到 2026.04；5 月全月只在“半导体总量月度口径”里展示。</p>
   </article>`;
   grid.innerHTML = scopeCard + displaySegments
     .map((segment) => {
@@ -634,7 +634,7 @@ function renderSummary() {
       return `<button class="summary-card ${activeSegment?.key === segment.key ? "active" : ""}" data-segment="${segment.key}">
         <div class="card-head">
           <span>${escapeHtml(segment.label)}</span>
-          <code>5月前20日</code>
+          <code>5月1-20日</code>
         </div>
         <div class="metric-label">暂估单位价值</div>
         <strong>${unitPrice(memoryItem?.unitPriceUsdPerKg)}</strong>
@@ -897,7 +897,8 @@ function renderPrelimChart() {
   const tenDayFreshness = freshnessByKey("ten_day_semiconductor");
   document.querySelector("#officialCoverageBadge").innerHTML = `<span>半导体总量</span><em>月度${escapeHtml(coverageSentence(monthlyFreshness))}；旬度${escapeHtml(coverageSentence(tenDayFreshness))}</em>`;
   const monthlyOfficial = state.data.officialMonthly ?? [];
-  document.querySelector("#monthlyOfficial").innerHTML = monthlyOfficial
+  const latestPreliminary = state.data.preliminary?.at(-1);
+  const monthlyCards = monthlyOfficial
     .map(
       (point) => `<a href="${escapeHtml(point.sourceUrl)}" target="_blank" rel="noreferrer">
         <span>${escapeHtml(point.periodLabel)}</span>
@@ -906,10 +907,18 @@ function renderPrelimChart() {
       </a>`
     )
     .join("");
+  const latestPreliminaryCard = latestPreliminary
+    ? `<a class="high-frequency" href="${escapeHtml(latestPreliminary.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">
+        <span>旬度截止 ${escapeHtml(latestPreliminary.periodLabel)}</span>
+        <strong>${compactUsd(latestPreliminary.valueUsd)}</strong>
+        <small>半导体出口暂定值，不是单日数据</small>
+      </a>`
+    : "";
+  document.querySelector("#monthlyOfficial").innerHTML = monthlyCards + latestPreliminaryCard;
   const labels = state.data.preliminary.map((point) => point.periodLabel);
-  const latest = state.data.preliminary[state.data.preliminary.length - 1];
+  const latest = latestPreliminary;
   document.querySelector("#prelimCaption").textContent = latest?.sourceName
-    ? `最新：${latest.periodLabel} 半导体出口 ${compactUsd(latest.valueUsd)}。来源：${latest.sourceName}`
+    ? `最新：${latest.periodLabel} 累计半导体出口 ${compactUsd(latest.valueUsd)}；这是 1-10 日窗口暂定值，不是 6 月 10 日单日值。来源：${latest.sourceName}`
     : "用于观察 KCS 旬度简报口径下的半导体出口节奏。";
   const series = [
     {
