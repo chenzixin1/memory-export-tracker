@@ -1527,8 +1527,13 @@ dd {
 
 .source-list .stacked-source-row {
   display: grid;
-  grid-template-columns: minmax(92px, 1fr) repeat(3, minmax(88px, 0.8fr)) minmax(88px, 0.8fr);
+  grid-template-columns:
+    minmax(88px, 0.9fr)
+    repeat(6, minmax(76px, 0.72fr))
+    minmax(82px, 0.8fr)
+    minmax(180px, 1.45fr);
   align-items: center;
+  gap: 6px;
 }
 
 .source-list .stacked-source-row em {
@@ -1537,8 +1542,32 @@ dd {
   text-align: right;
 }
 
+.source-list .stacked-source-row em.positive {
+  color: var(--good);
+}
+
+.source-list .stacked-source-row em.negative {
+  color: var(--bad);
+}
+
+.source-list .stacked-source-row em.neutral {
+  color: var(--muted);
+}
+
 .source-list .stacked-source-row strong {
   text-align: right;
+}
+
+.source-list .stacked-source-row small {
+  min-width: 0;
+  overflow: visible;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: right;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .stacked-source-head {
@@ -1551,7 +1580,8 @@ dd {
 
 .stacked-source-head span,
 .stacked-source-head em,
-.stacked-source-head strong {
+.stacked-source-head strong,
+.stacked-source-head small {
   color: var(--muted);
 }
 
@@ -1789,6 +1819,11 @@ svg text {
 
   .source-list .stacked-source-row span {
     grid-column: 1 / -1;
+  }
+
+  .source-list .stacked-source-row small {
+    grid-column: 1 / -1;
+    text-align: left;
   }
 
   .memory-focus-kpis {

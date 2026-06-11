@@ -1151,10 +1151,14 @@ function renderPrelimChart() {
   document.querySelector("#sourceList").innerHTML = state.data.preliminary
     ? `<div class="stacked-source-row stacked-source-head">
         <span>月份</span>
-        <em>1-10 / 1-20</em>
-        <em>11-20</em>
+        <em>1-10日</em>
+        <em>1-10 MoM</em>
+        <em>11-20日</em>
+        <em>11-20 MoM</em>
         <em>21-月末</em>
-        <strong>全月 / YoY</strong>
+        <em>21-月末 MoM</em>
+        <strong>全月 / 已披露</strong>
+        <small>YoY / 来源</small>
       </div>` +
       stackedMonths
         .map(
@@ -1162,9 +1166,13 @@ function renderPrelimChart() {
             `<a class="stacked-source-row" href="${escapeHtml(month.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">
               <span>${escapeHtml(month.monthLabel)}</span>
               <em>${Number.isFinite(month.first10) ? compactUsd(month.first10) : Number.isFinite(month.combinedFirstTwenty) ? `${compactUsd(month.combinedFirstTwenty)} 1-20累计` : "n/a"}</em>
+              <em class="${deltaClassFromValue(month.first10MoM)}">${formatChange(month.first10MoM)}</em>
               <em>${Number.isFinite(month.secondTen) ? compactUsd(month.secondTen) : "n/a"}</em>
+              <em class="${deltaClassFromValue(month.secondTenMoM)}">${formatChange(month.secondTenMoM)}</em>
               <em>${Number.isFinite(month.tail) ? compactUsd(month.tail) : "n/a"}</em>
-              <strong>${compactUsd(month.knownTotal)}${Number.isFinite(month.fullYoYPct) ? ` · ${formatChange(month.fullYoYPct)}` : ""}</strong>
+              <em class="${deltaClassFromValue(month.tailMoM)}">${formatChange(month.tailMoM)}</em>
+              <strong>${Number.isFinite(month.full) ? compactUsd(month.full) : `${compactUsd(month.knownTotal)} 已披露`}</strong>
+              <small>${Number.isFinite(month.fullYoYPct) ? formatChange(month.fullYoYPct) : "n/a"} · ${escapeHtml(month.sourceName)}</small>
             </a>`
         )
         .join("")

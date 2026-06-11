@@ -319,8 +319,8 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         productName: "半导体出口",
         source: "official_public",
         status: "preliminary",
-        sourceName: "MOTIE July 2025 Export-Import Trends, reposted by Richstock",
-        sourceUrl: "https://richstock.tistory.com/2196"
+        sourceName: "MOTIE July 2025 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=269418"
       },
       {
         period: "2025.08",
@@ -341,10 +341,10 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         valueYoYPct: 22.0,
         productKey: "semiconductor",
         productName: "半导体出口",
-        source: "official_public_media_repost",
+        source: "official_public",
         status: "preliminary",
-        sourceName: "MOTIE September 2025 Export-Import Trends, reported by Yonhap",
-        sourceUrl: "https://www.yna.co.kr/view/AKR20251001034300003"
+        sourceName: "MOTIE September 2025 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=271930"
       },
       {
         period: "2025.10",
@@ -366,8 +366,8 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         productName: "半导体出口",
         source: "official_public",
         status: "preliminary",
-        sourceName: "MOTIE November 2025 Export-Import Trends",
-        sourceUrl: "https://www.motir.go.kr/kor/article/ATCL3f49a5a8c/171276/view"
+        sourceName: "MOTIE November 2025 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=274124"
       },
       {
         period: "2025.12",
@@ -390,8 +390,8 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         productName: "半导体出口",
         source: "official_public",
         status: "preliminary",
-        sourceName: "MOTIE January 2026 Export-Import Trends",
-        sourceUrl: "https://www.motir.go.kr/attach/down/095a2dda9c864e1d90d751f7668a1117/a0f07e39ad80bda4be23f80fd7a6a1ec/9a9db098b587ee18b321c826f3707a49"
+        sourceName: "MOTIE January 2026 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=276561"
       },
       {
         period: "2026.02",
@@ -425,8 +425,8 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         productName: "半导体出口",
         source: "official_public",
         status: "preliminary",
-        sourceName: "MOTIE April 2026 Export-Import Trends; KCS final April release listed 2026-05-15",
-        sourceUrl: "https://www.asiae.co.kr/en/article/IT/2026050109205280402",
+        sourceName: "MOTIE April 2026 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=280536",
         finalSourceName: "KCS 2026 April monthly import/export status [final], reposted by NLIC",
         finalSourceUrl: "https://www.nlic.go.kr/nlic/logpolDt.action?command=VIEW&fldLogpolRefSeq=1941",
         officialListUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
