@@ -38,6 +38,26 @@ function unwrapJsonItems(json) {
   return Array.isArray(item) ? item : [item];
 }
 
+const tradeDataWeb = {
+  pageUrl: "https://www.tradedata.go.kr/cts/hmpgEng/openETS0200013Q.do?menuId=ETS_MNE_10200000",
+  queryUrl: "https://www.tradedata.go.kr/cts/hmpgEng/retrieveTradeHsCodeEng.do",
+  userAgent:
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+};
+
+function cookieHeader(setCookie) {
+  if (!setCookie) return "";
+  return setCookie
+    .split(/,(?=[^ ;]+=)/)
+    .map((item) => item.split(";")[0])
+    .filter(Boolean)
+    .join("; ");
+}
+
+function parseTradeDataWebItems(json) {
+  return (json?.items ?? []).filter((item) => item.priodTitle && item.priodTitle !== "TOTAL");
+}
+
 export async function fetchMonthlyProductSeries(product, range = getLookbackRange(env.lookbackMonths)) {
   if (!env.serviceKey) {
     throw new Error("DATA_GO_KR_SERVICE_KEY is not configured.");
@@ -85,6 +105,75 @@ export async function fetchMonthlyProductSeries(product, range = getLookbackRang
         productKey: product.key,
         productName: product.name,
         source: "official_api",
+        status: "final"
+      };
+    })
+    .filter((point) => point.period && point.valueUsd > 0)
+    .sort((a, b) => a.period.localeCompare(b.period));
+}
+
+export async function fetchMonthlyProductSeriesFromTradeDataWeb(product, range = getLookbackRange(env.lookbackMonths)) {
+  const pageResponse = await fetch(tradeDataWeb.pageUrl, {
+    headers: {
+      accept: "text/html,application/xhtml+xml",
+      "user-agent": tradeDataWeb.userAgent
+    }
+  });
+  if (!pageResponse.ok) {
+    throw new Error(`KCS TradeData page request failed: ${pageResponse.status} ${pageResponse.statusText}`);
+  }
+  await pageResponse.text();
+
+  const params = new URLSearchParams({
+    priodKind: "MON",
+    priodFr: range.start,
+    priodTo: range.end,
+    langTpcd: "ENG",
+    ttwgTpcd: "1",
+    selectPaging: "1",
+    showPagingLine: "100",
+    sortColumn: "",
+    sortOrder: "",
+    hsSgnGrpCol: "HS6_SGN",
+    hsSgnWhrCol: "HS6_SGN",
+    hsSgn: product.hsCode,
+    subHsSgn: "N"
+  });
+  const response = await fetch(tradeDataWeb.queryUrl, {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/javascript, */*; q=0.01",
+      "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "x-requested-with": "XMLHttpRequest",
+      origin: "https://www.tradedata.go.kr",
+      referer: tradeDataWeb.pageUrl,
+      "user-agent": tradeDataWeb.userAgent,
+      cookie: cookieHeader(pageResponse.headers.get("set-cookie"))
+    },
+    body: params
+  });
+  if (!response.ok) {
+    throw new Error(`KCS TradeData web query failed: ${response.status} ${response.statusText}`);
+  }
+
+  const parsed = await response.json();
+  return parseTradeDataWebItems(parsed)
+    .map((item) => {
+      const valueUsd = toNumber(item.expUsdAmt) * 1000;
+      const weightKg = toNumber(item.expTtwg);
+      const period = String(item.priodTitle ?? "");
+      return {
+        period,
+        periodLabel: period.replace(".", "-"),
+        valueUsd,
+        weightKg,
+        unitPriceUsdPerKg: weightKg > 0 ? valueUsd / weightKg : null,
+        hsCode: String(item.hsSgn ?? product.hsCode),
+        productKey: product.key,
+        productName: product.name,
+        source: "official_tradedata_web",
+        sourceName: "KCS TradeData English by H.S Code monthly statistics",
+        sourceUrl: tradeDataWeb.pageUrl,
         status: "final"
       };
     })
