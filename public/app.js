@@ -766,7 +766,7 @@ function monthlyChartCard(segment) {
       <span>${escapeHtml(segment.label)} 月度 HS</span>
       <code>${escapeHtml(segment.hsCode)}</code>
     </div>
-    <p class="chart-inline-note">5月官方HS细分还没发布；这条 HS 明细最新到 ${escapeHtml(latest?.periodLabel ?? "--")}。</p>
+    <p class="chart-inline-note">5月官方HS细分已发布；这条 HS 明细最新到 ${escapeHtml(latest?.periodLabel ?? "--")}。</p>
     ${amountGrowthDualAxisSvg({
       points,
       labels: points.map((point) => point.period),
@@ -799,7 +799,7 @@ function officialMonthlyBridgeCard() {
     <div class="may-bridge-copy">
       <span>半导体总量月度口径 · 已到 2026.05</span>
       <h3>5 月全月半导体出口 ${compactUsd(latest?.valueUsd ?? 0)}</h3>
-      <p>这条线是韩国半导体总出口，不是 SSD、DRAM/HBM 或 NAND 的 HS 细分。5 月按 HS 的金额、净重和单位价值还没在 KCS TradeData 放出，所以官方细分图仍只能画到 2026.04。</p>
+      <p>这条线是韩国半导体总出口，不是 SSD、DRAM/HBM 或 NAND 的 HS 细分。5 月 SSD 与 DRAM/HBM 官方 HS 金额、净重和单位价值已通过 KCS TradeData 同源查询落库。</p>
       <dl>
         <div><dt>YoY</dt><dd class="${deltaClassFromValue(latest?.valueYoYPct)}">${formatPct(latest?.valueYoYPct)}</dd></div>
         <div><dt>总出口</dt><dd>${compactUsd(latest?.overallExportValueUsd ?? 0)}</dd></div>
@@ -839,8 +839,8 @@ function renderSummary() {
       <code>别混用</code>
     </div>
     <div class="metric-label">现在有三层数据</div>
-    <strong>5月官方HS细分未发布</strong>
-    <p class="card-freshness">顶部三张 DRAM/SSD/NAND 卡是 5 月 1-20 日细分暂估，不是官方月度 HS；中间 DRAM/SSD 图是官方 HS 月度明细，最新只能到 2026.04；5 月全月只在“半导体总量月度口径”里展示。</p>
+    <strong>5月官方HS已落库</strong>
+    <p class="card-freshness">顶部三张 DRAM/SSD/NAND 卡是 5 月 1-20 日细分暂估，不是官方月度 HS；中间 DRAM/SSD 图是官方 HS 月度明细，已更新到 2026.05；半导体总量月度口径展示全行业总出口。</p>
   </article>`;
   grid.innerHTML = scopeCard + displaySegments
     .map((segment) => {
@@ -1064,8 +1064,8 @@ function renderDetails() {
 
 function renderMainChart() {
   const hsFreshness = freshnessByKey("monthly_hs");
-  document.querySelector("#mainCoverageBadge").innerHTML = `<span>口径说明</span><strong>5月官方HS细分未发布</strong><em>DRAM/SSD 的 HS 金额、净重、单位价值最新到 2026.04；5 月前 20 日存储细分来自暂估表，不是连续月度 HS。${escapeHtml(hsFreshness?.note ?? "")}</em>`;
-  document.querySelector("#mainChartTitle").textContent = `5月总量已发布；官方HS细分仍到4月`;
+  document.querySelector("#mainCoverageBadge").innerHTML = `<span>口径说明</span><strong>5月官方HS已发布</strong><em>DRAM/SSD 的 HS 金额、净重、单位价值最新到 2026.05；5 月前 20 日存储细分来自暂估表，不是连续月度 HS。${escapeHtml(hsFreshness?.note ?? "")}</em>`;
+  document.querySelector("#mainChartTitle").textContent = `5月总量与官方HS细分已更新`;
   document.querySelector("#mainChart").innerHTML = `${officialMonthlyBridgeCard()}<div class="three-chart-grid">
     ${monthlyChartCard(displaySegments[0])}
     ${monthlyChartCard(displaySegments[1])}

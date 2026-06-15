@@ -1,9 +1,9 @@
 {
   "meta": {
-    "lastUpdated": "2026-06-11T09:30:00.000Z",
+    "lastUpdated": "2026-06-15T08:22:16.184Z",
     "nextScheduledUpdate": null,
     "mode": "mixed_public",
-    "message": "公开数据已覆盖至：SSD 与 DRAM/HBM 月度 HS 2026年4月、半导体月度 2026年5月、旬度高频窗口 2026年6月1-10日；截至 2026-06-11 未配置 DATA_GO_KR_SERVICE_KEY，月度 HS 来自 KCS TradeData 官方网页核验。"
+    "message": "公开数据已覆盖至：SSD 与 DRAM/HBM 月度 HS 2026年5月、半导体月度 2026年5月、旬度高频窗口 2026年6月1-10日；截至 2026-06-15 未配置 DATA_GO_KR_SERVICE_KEY，月度 HS 来自 KCS TradeData 官方网页同源查询核验。"
   },
   "products": [
     {
@@ -11,7 +11,7 @@
       "name": "SSD",
       "hsCode": "852351",
       "unitBasis": "kg",
-      "note": "HS 8523.51 为 Solid-state non-volatile storage devices；KCS TradeData 当前可查询该口径，且 2026年4月金额与 Korea.kr/MSIT SSD 出口额对齐。"
+      "note": "HS 8523.51 为 Solid-state non-volatile storage devices；KCS TradeData 当前可查询该口径，已核验至 2026年5月，2026年4月金额曾与 Korea.kr/MSIT SSD 出口额对齐。"
     },
     {
       "key": "dram_hbm",
@@ -247,6 +247,20 @@
       "status": "final"
     },
     {
+      "period": "2026.05",
+      "periodLabel": "2026-05",
+      "valueUsd": 3973455000,
+      "weightKg": 177484,
+      "hsCode": "852351",
+      "productKey": "ssd",
+      "productName": "SSD",
+      "source": "official_tradedata_web",
+      "sourceName": "KCS TradeData English by H.S Code monthly statistics",
+      "sourceUrl": "https://www.tradedata.go.kr/cts/hmpgEng/openETS0200013Q.do?menuId=ETS_MNE_10200000",
+      "status": "final",
+      "unitPriceUsdPerKg": 22387.680016226815
+    },
+    {
       "period": "2025.01",
       "periodLabel": "2025-01",
       "valueUsd": 4765687000,
@@ -469,17 +483,31 @@
       "sourceName": "KCS TradeData English by H.S Code monthly statistics",
       "sourceUrl": "https://www.tradedata.go.kr/cts/hmpgEng/openETS0200013Q.do?menuId=ETS_MNE_10200000",
       "status": "final"
+    },
+    {
+      "period": "2026.05",
+      "periodLabel": "2026-05",
+      "valueUsd": 24950563000,
+      "weightKg": 326954,
+      "hsCode": "854232",
+      "productKey": "dram_hbm",
+      "productName": "DRAM / HBM",
+      "source": "official_tradedata_web",
+      "sourceName": "KCS TradeData English by H.S Code monthly statistics",
+      "sourceUrl": "https://www.tradedata.go.kr/cts/hmpgEng/openETS0200013Q.do?menuId=ETS_MNE_10200000",
+      "status": "final",
+      "unitPriceUsdPerKg": 76312.15094478123
     }
   ],
   "freshness": [
     {
       "key": "monthly_hs",
       "label": "SSD / DRAM-HBM HS 明细",
-      "latestPeriod": "2026年4月",
-      "latestReleaseDate": "KCS TradeData 官方网页已更新至 2026.04",
-      "nextExpectedDate": "2026年5月最终值预计 2026年6月中旬随 KCS/data.go.kr/TRASS 更新",
+      "latestPeriod": "2026年5月",
+      "latestReleaseDate": "KCS TradeData 官方网页已更新至 2026.05（2026-06-15 浏览器同源查询核验）",
+      "nextExpectedDate": "2026年6月最终值预计 2026年7月中旬随 KCS/data.go.kr/TRASS 更新",
       "status": "official_public_web",
-      "note": "Chrome 可访问 KCS TradeData 英文 By H.S Code 页面，并通过页面同源查询取得月度出口金额和 KG。SSD 改用 HS 852351（Solid-state non-volatile storage devices），旧 HSK 8471704010 在当前官方查询中无结果；DRAM/HBM 继续用 HS 854232（Memories）。"
+      "note": "Chrome 可访问 KCS TradeData 英文 By H.S Code 页面，并通过页面同源查询取得月度出口金额和 KG。SSD 改用 HS 852351（Solid-state non-volatile storage devices），旧 HSK 8471704010 在当前官方查询中无结果；DRAM/HBM 继续用 HS 854232（Memories）。2026.05 已于 2026-06-15 核验落库。"
     },
     {
       "key": "monthly_semiconductor",
@@ -516,7 +544,7 @@
       "sourceName": "KCS TradeData English by H.S Code monthly statistics",
       "sourceUrl": "https://www.tradedata.go.kr/cts/hmpgEng/openETS0200013Q.do?menuId=ETS_MNE_10200000",
       "status": "official_public_web_verified",
-      "note": "Browser-visible official KCS page provides monthly HS export value in thousand USD and export weight in KG through its same-site query. Verified 2025.01-2026.04 for SSD HS 852351 and DRAM/HBM proxy HS 854232."
+      "note": "Browser-visible official KCS page provides monthly HS export value in thousand USD and export weight in KG through its same-site query. Verified 2025.01-2026.05 for SSD HS 852351 and DRAM/HBM proxy HS 854232."
     },
     {
       "key": "data_go_kr_itemtrade",
@@ -524,7 +552,7 @@
       "sourceName": "KCS/data.go.kr Itemtrade API",
       "sourceUrl": "https://www.data.go.kr/data/15101609/openapi.do?recommendDataYn=Y",
       "status": "requires_DATA_GO_KR_SERVICE_KEY",
-      "note": "Official API source for monthly HS export value and net weight. DATA_GO_KR_SERVICE_KEY was not present in the 2026-05-22 refresh environment; use SSD HS 852351 and DRAM/HBM proxy HS 854232 when configured."
+      "note": "Official API source for monthly HS export value and net weight. DATA_GO_KR_SERVICE_KEY was not present in the 2026-06-15 refresh environment; browser same-origin query was used for the 2026.05 official TradeData rows."
     },
     {
       "key": "korea_ict_202604",
@@ -596,7 +624,7 @@
       "sourceName": "KITA K-stat public page",
       "sourceUrl": "https://stat.kita.net/newMain.screen",
       "status": "official_or_industry_public_partial",
-      "note": "Browser-visible public page showed Korea updated to 2026.04 plus an 854232 export-by-country widget and 2026.04 ICT/IC semiconductor context, but not the monthly net-weight fields needed for USD/kg."
+      "note": "Browser-visible public page and same-origin TradeData query were rechecked on 2026-06-15; monthly HS value and KG fields are available through 2026.05 for SSD 852351 and DRAM/HBM proxy 854232."
     }
   ],
   "officialMonthly": [
