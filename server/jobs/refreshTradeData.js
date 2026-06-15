@@ -2,23 +2,22 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { productConfigs } from "../config.js";
 import { fetchMonthlyProductSeries } from "../koreaTradeClient.js";
-import { buildSampleStore } from "../sampleData.js";
-import { writeStore } from "../storage.js";
+import { readStore, writeStore } from "../storage.js";
 
 export async function refreshTradeData() {
   if (!process.env.DATA_GO_KR_SERVICE_KEY) {
-    const sample = buildSampleStore();
-    await writeStore(sample);
-    return sample;
+    const existing = await readStore();
+    await writeStore(existing);
+    return existing;
   }
 
   try {
     const monthlyResponses = await Promise.all(productConfigs.map((product) => fetchMonthlyProductSeries(product)));
-    const sample = buildSampleStore();
+    const base = await readStore();
     const store = {
-      ...sample,
+      ...base,
       meta: {
-        ...sample.meta,
+        ...base.meta,
         lastUpdated: new Date().toISOString(),
         nextScheduledUpdate: null,
         mode: "official_api",
@@ -30,10 +29,13 @@ export async function refreshTradeData() {
     await writeStore(store);
     return store;
   } catch (error) {
-    const sample = buildSampleStore();
-    sample.meta.message = `官方接口拉取失败，当前回落到样例数据：${error instanceof Error ? error.message : "unknown error"}`;
-    await writeStore(sample);
-    return sample;
+    const fallback = await readStore();
+    fallback.meta = {
+      ...fallback.meta,
+      message: `官方接口拉取失败，保留最近一次已核验数据：${error instanceof Error ? error.message : "unknown error"}`
+    };
+    await writeStore(fallback);
+    return fallback;
   }
 }
 
