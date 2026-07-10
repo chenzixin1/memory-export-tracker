@@ -7,8 +7,9 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "fetch": "node server/jobs/refreshTradeData.js",
+    "test": "node --test test/*.test.js",
     "validate:provisional": "node server/jobs/validateProvisionalDetail.js",
-    "check": "node --check server/index.js && node --check server/jobs/refreshTradeData.js && node --check server/jobs/validateProvisionalDetail.js && node --check public/app.js && node --check workers/memory-export-worker.js && npm run validate:provisional",
+    "check": "node --check server/index.js && node --check server/jobs/refreshTradeData.js && node --check server/taiwanDemandClient.js && node --check server/jobs/validateProvisionalDetail.js && node --check public/app.js && node --check workers/memory-export-worker.js && npm test && npm run validate:provisional",
     "deploy:cf": "wrangler deploy -c wrangler.memory-export.toml",
     "deploy:pages": "wrangler pages deploy public --project-name memory-export-tracker --branch main"
   },

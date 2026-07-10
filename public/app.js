@@ -1003,10 +1003,15 @@ function taiwanDemandCard(route) {
 function renderTaiwanDemand() {
   const demand = state.data.taiwanDemand;
   if (!demand?.routes?.length) return;
-  const allPeriods = demand.monthly.map((point) => point.period).sort();
-  document.querySelector("#taiwanDemandCoverage").textContent = `最新：${allPeriods.at(-1)?.replace(".", "-") ?? "--"} · 官方公开数据`;
+  const routeCoverage = demand.routes
+    .map((route) => {
+      const latest = routePoints(route).at(-1)?.period?.replace(".", "-") ?? "--";
+      return `${route.shortTitle} ${latest}`;
+    })
+    .join(" · ");
+  document.querySelector("#taiwanDemandCoverage").textContent = `${routeCoverage} · 官方公开数据自动更新`;
   document.querySelector("#taiwanDemandMethod").textContent =
-    "这块现在显示的是已落库的代理/辅助序列；朋友指出的台湾正码是 85423200234（进口DRAM/HBM）和 84715000003（出口处理单元），下方已单独列出来源入口和用途边界。";
+    "韩国→台湾来自台湾财政部第16类机械及电机设备进口代理；日本→台湾来自日本财务省 e-Stat HS 852351000。两条线按各自官方发布时间独立刷新。";
   document.querySelector("#taiwanHsGuide").innerHTML = taiwanHsGuide.map(taiwanHsCard).join("");
   document.querySelector("#taiwanDemandGrid").innerHTML = demand.routes.map(taiwanDemandCard).join("");
   bindChartInteractions(document.querySelector("#taiwanDemandGrid"));

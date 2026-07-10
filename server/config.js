@@ -6,7 +6,8 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 export const paths = {
   rootDir,
   publicDir: path.join(rootDir, "public"),
-  dataFile: path.join(rootDir, "data", "trade-data.json")
+  dataFile: path.join(rootDir, "data", "trade-data.json"),
+  taiwanDataFile: path.join(rootDir, "data", "taiwan-ai-demand.json")
 };
 
 export const productConfigs = [

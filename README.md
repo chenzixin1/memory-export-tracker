@@ -7,7 +7,7 @@
 - 月度 HS 品类数据：KCS TradeData 英文 `By H.S Code` 公开页；配置密钥时也可调用 KCS/data.go.kr `관세청_품목별 수출입실적(GW)` 的 `http://apis.data.go.kr/1220000/Itemtrade/getItemtradeList`。
 - 10 日高频窗口：KCS 官网、KCS TradeData 首页或 Korea.kr 每月 11 日/21 日附近发布/转载的 `수출입 현황` 简报；TRASS/KITA 仅在公开可访问时用于交叉核验。
 - 存储细分暂估：`data/provisional-memory-detail.json`，人工核验后录入 DRAM / SSD / NAND 等公开市场转述或券商表格数据。
-- 台湾 AI 拉货代理：`data/taiwan-ai-demand.json`，包含台湾财政部开放数据的“自韩国进口机械及电机设备”代理指标，以及日本财务省 e-Stat 的日本对台湾 HS `852351000` SSD 出口。
+- 台湾 AI 拉货代理：`data/taiwan-ai-demand.json`，由刷新任务自动抓取台湾财政部“自韩国进口机械及电机设备”官方 CSV，以及日本财务省 e-Stat 对台湾 HS `852351000` SSD 官方出口 CSV。
 
 ## 运行
 
@@ -123,7 +123,7 @@ npm start
 这套数据不是纯 API 项目，更新分成自动和人工确认两层：
 
 - 自动层：`npm run fetch` 更新可通过官方接口或稳定公开页取得的月度 HS、半导体总量和静态 fallback。
-- 人工确认层：把华尔街见闻、TRASS/KITA、Telegram 镜像或券商表格里的 DRAM / SSD / NAND 暂估细分录入 `data/provisional-memory-detail.json`；台湾链条数据录入 `data/taiwan-ai-demand.json`。
+- 人工确认层：把华尔街见闻、TRASS/KITA、Telegram 镜像或券商表格里的 DRAM / SSD / NAND 暂估细分录入 `data/provisional-memory-detail.json`。台湾链条已接入 `npm run fetch` 自动更新；单一官方来源暂时失败时保留该路线最近一次成功数据。
 - 校验层：`npm run validate:provisional` 检查暂估细分是否包含 DRAM、SSD、NAND，字段类型和来源链接是否完整。
 - 发布层：`npm run check` 通过后，GitHub workflow 或 Worker publish endpoint 将 `public/data/trade-data.json` 发布到 Cloudflare KV。
 

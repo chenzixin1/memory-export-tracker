@@ -2,7 +2,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { productConfigs } from "../config.js";
 import { fetchMonthlyProductSeries, fetchMonthlyProductSeriesFromTradeDataWeb } from "../koreaTradeClient.js";
-import { readStore, writeStore } from "../storage.js";
+import { readStore, writeStore, writeTaiwanDemand } from "../storage.js";
+import { refreshTaiwanDemand } from "../taiwanDemandClient.js";
 
 function latestMonthlyPeriod(points) {
   return points.map((point) => point.period).filter(Boolean).sort().at(-1);
@@ -140,6 +141,7 @@ async function fetchMonthlyResponsesFromTradeDataWeb(reason) {
 
 export async function refreshTradeData() {
   const base = await readStore();
+  const taiwanDemand = await refreshTaiwanDemand(base.taiwanDemand);
 
   try {
     let refresh;
@@ -166,18 +168,22 @@ export async function refreshTradeData() {
         message: refresh.message
       },
       products: productConfigs,
-      monthly: refresh.monthly
+      monthly: refresh.monthly,
+      taiwanDemand
     };
     updateMonthlyHsMetadata(store, latestPeriod, refresh.source);
     updateMonthlySemiconductorMetadata(store);
     await writeStore(store);
+    await writeTaiwanDemand(taiwanDemand);
     return store;
   } catch (error) {
     base.meta = {
       ...base.meta,
       message: `官方接口拉取失败，保留最近一次已核验数据：${error instanceof Error ? error.message : "unknown error"}`
     };
+    base.taiwanDemand = taiwanDemand;
     await writeStore(base);
+    await writeTaiwanDemand(taiwanDemand);
     return base;
   }
 }
@@ -185,7 +191,10 @@ export async function refreshTradeData() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   refreshTradeData()
     .then((store) => {
-      console.log(`[refresh] ${store.meta.mode}: ${store.monthly.length} monthly points`);
+      const routePeriods = store.taiwanDemand?.meta?.routeLatestPeriods ?? {};
+      console.log(
+        `[refresh] ${store.meta.mode}: ${store.monthly.length} monthly points; Taiwan routes Korea ${routePeriods.korea_to_taiwan_electrical ?? "--"}, Japan ${routePeriods.japan_to_taiwan_ssd ?? "--"}`
+      );
     })
     .catch((error) => {
       console.error(error);

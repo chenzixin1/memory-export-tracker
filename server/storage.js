@@ -19,3 +19,8 @@ export async function writeStore(store) {
   await fs.mkdir(path.dirname(publicDataFile), { recursive: true });
   await fs.writeFile(publicDataFile, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }
+
+export async function writeTaiwanDemand(taiwanDemand) {
+  await fs.mkdir(path.dirname(paths.taiwanDataFile), { recursive: true });
+  await fs.writeFile(paths.taiwanDataFile, `${JSON.stringify(taiwanDemand, null, 2)}\n`, "utf8");
+}
