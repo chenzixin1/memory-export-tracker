@@ -118,7 +118,7 @@ async function dispatchWorkflow(env, context = {}) {
   const owner = env.GITHUB_OWNER || "chenzixin1";
   const repo = env.GITHUB_REPO || "memory-export-tracker";
   const workflowId = env.GITHUB_WORKFLOW_ID || "update-memory-export-kv.yml";
-  const ref = env.GITHUB_REF || "codex/regimealpha-cloudflare-redesign";
+  const ref = env.GITHUB_REF || "main";
   const startedAt = new Date().toISOString();
 
   if (!env.GITHUB_DISPATCH_TOKEN) {

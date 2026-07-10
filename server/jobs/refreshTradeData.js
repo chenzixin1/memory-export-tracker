@@ -57,6 +57,67 @@ function updateMonthlyHsMetadata(store, latestPeriod, source) {
   }
 }
 
+function updateMonthlySemiconductorMetadata(store) {
+  const freshness = store.freshness?.find((item) => item.key === "monthly_semiconductor");
+  if (freshness?.latestPeriod === "2026年5月") {
+    freshness.latestReleaseDate = "2026-06-15";
+    freshness.status = "official_public_final";
+    freshness.note =
+      "KCS 主站已在 2026-06-15 挂出《2026년 5월 월간 수출입 현황 [확정치]》。5 月半导体出口约 371.6 亿美元，同比 +169.4%；5 月总出口约 877.5 亿美元，同比 +53.2%。";
+  }
+
+  for (const item of store.sourceRegistry ?? []) {
+    if (item.key === "motie_kcs_202605_monthly") {
+      item.status = "official_public_crosschecked";
+      item.sourceName = "MOTIE/KCS May 2026 Export-Import Trends, crosschecked with KCS final monthly bulletin list";
+      item.sourceUrl = "https://eiec.kdi.re.kr/policy/materialView.do?num=281941";
+      item.officialListUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      item.note =
+        "June 1 MOTIE/KCS monthly release reported May exports of USD 87.75B (+53.2% YoY) and semiconductor exports of USD 37.16B (+169.4% YoY). KCS later listed the official May monthly final bulletin on 2026-06-15, confirming the release window.";
+    }
+  }
+
+  for (const point of store.monthly ?? []) {
+    if (point.productKey === "semiconductor" && point.period === "2026.05") {
+      point.source = "official_public_crosschecked";
+      point.status = "final";
+      point.finalSourceName = "KCS 2026 May monthly import/export status [final]";
+      point.finalSourceUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.officialListUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.note =
+        "May semiconductor exports reached USD 37.16B, up 169.4% YoY; total exports reached USD 87.75B, up 53.2% YoY. The June 1 MOTIE/KCS release was later reflected in the KCS May final monthly bulletin list on 2026-06-15.";
+    }
+  }
+
+  for (const point of store.officialMonthly ?? []) {
+    if (point.productKey === "semiconductor" && point.period === "2026.05") {
+      point.source = "official_public_crosschecked";
+      point.status = "final";
+      point.finalSourceName = "KCS 2026 May monthly import/export status [final]";
+      point.finalSourceUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.officialListUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.note =
+        "May semiconductor exports reached USD 37.16B, up 169.4% YoY; total exports reached USD 87.75B, up 53.2% YoY. KCS listed the May final monthly bulletin on 2026-06-15.";
+    }
+  }
+
+  for (const point of store.preliminary ?? []) {
+    if (point.productKey === "semiconductor" && point.period === "2026.05-1~31") {
+      point.source = "official_public_crosschecked";
+      point.finalSourceName = "KCS 2026 May monthly import/export status [final]";
+      point.finalSourceUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.officialListUrl = "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891";
+      point.note =
+        "May monthly release: total exports USD 87.75B (+53.2% YoY), semiconductor exports USD 37.16B (+169.4% YoY). KCS listed the May final monthly bulletin on 2026-06-15.";
+    }
+  }
+
+  const tenDayFreshness = store.freshness?.find((item) => item.key === "ten_day_semiconductor");
+  if (tenDayFreshness?.latestPeriod === "2026年6月1-20日") {
+    tenDayFreshness.nextExpectedDate = "2026-07-13 左右发布 2026年7月1-10日旬度暂定值";
+  }
+}
+
 async function fetchMonthlyResponsesFromApi() {
   const monthly = await Promise.all(productConfigs.map((product) => fetchMonthlyProductSeries(product)));
   return {
@@ -108,6 +169,7 @@ export async function refreshTradeData() {
       monthly: refresh.monthly
     };
     updateMonthlyHsMetadata(store, latestPeriod, refresh.source);
+    updateMonthlySemiconductorMetadata(store);
     await writeStore(store);
     return store;
   } catch (error) {

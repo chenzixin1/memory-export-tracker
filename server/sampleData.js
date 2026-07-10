@@ -149,7 +149,7 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       nextScheduledUpdate: null,
       mode: "mixed_public",
       message:
-        "公开数据已覆盖至：SSD 与 DRAM/HBM 月度 HS 2026年4月、半导体月度 2026年5月、旬度高频窗口 2026年6月1-10日；截至 2026-06-11 未配置 DATA_GO_KR_SERVICE_KEY，月度 HS 来自 KCS TradeData 官方网页核验。"
+        "公开数据已覆盖至：SSD 与 DRAM/HBM 月度 HS 2026年5月、半导体月度 2026年6月、旬度高频窗口 2026年6月1-20日；截至 2026-07-10 未配置 DATA_GO_KR_SERVICE_KEY，月度 HS 来自 KCS TradeData 官方网页核验。"
     },
     products: productConfigs,
     monthly,
@@ -167,21 +167,21 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       {
         key: "monthly_semiconductor",
         label: "半导体月度总量",
-        latestPeriod: "2026年5月",
-        latestReleaseDate: "2026-06-01",
-        nextExpectedDate: "2026-07-01 左右发布 2026年6月月度初值",
+        latestPeriod: "2026年6月",
+        latestReleaseDate: "2026-07-01",
+        nextExpectedDate: "2026-07-15 左右发布 2026年6月月度确报",
         status: "official_public",
-        note: "5 月半导体出口约 371.6 亿美元，同比 +169.4%；5 月总出口约 877.5 亿美元，同比 +53.2%，MOTIE/KCS 6 月 1 日月度口径。"
+        note: "MOTIE 已在 2026-07-01 发布《2026년 6월 및 상반기 수출입 동향》。6 月半导体出口约 448.2 亿美元，同比 +199.5%；6 月总出口约 1,022.5 亿美元，同比 +70.9%。"
       },
       {
         key: "ten_day_semiconductor",
         label: "半导体旬度高频",
-        latestPeriod: "2026年6月1-10日",
-        latestReleaseDate: "2026-06-11",
-        nextExpectedDate: "2026-06-21/22 左右发布 2026年6月1-20日旬度暂定值",
+        latestPeriod: "2026年6月1-20日",
+        latestReleaseDate: "2026-06-22",
+        nextExpectedDate: "2026-07-13 左右发布 2026年7月1-10日旬度暂定值",
         status: "official_public_media_repost",
         note:
-          "6 月 1-10 日半导体出口约 110.68 亿美元，同比 +205.8%；总出口 286.35 亿美元，同比 +85.9%，进口 233.52 亿美元，同比 +35.6%，贸易顺差 52.82 亿美元。"
+          "6 月 1-20 日半导体出口约 255 亿美元，同比 +188.4%；总出口 620 亿美元，同比 +60.4%，进口 445 亿美元，同比 +23.2%，贸易顺差 175 亿美元。"
       },
       {
         key: "memory_provisional_detail",
@@ -246,10 +246,19 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
       {
         key: "motie_kcs_202605_monthly",
         section: "monthly_semiconductor,ten_day_semiconductor",
-        sourceName: "MOTIE/KCS May 2026 Export-Import Trends, reported by ChosunBiz",
+        sourceName: "MOTIE/KCS May 2026 Export-Import Trends, crosschecked with KCS final monthly bulletin list",
         sourceUrl: "https://biz.chosun.com/en/en-policy/2026/06/01/5BV3STEUKZBVNPUT556OFOA76I/",
-        status: "official_public_media_repost",
-        note: "June 1 monthly release reports May exports of USD 87.75B (+53.2% YoY) and semiconductor exports of USD 37.16B (+169.4% YoY). The dashboard derives the May 21-31 semiconductor tail from this monthly value minus the KCS May 1-20 value."
+        status: "official_public_crosschecked",
+        officialListUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
+        note: "June 1 MOTIE/KCS monthly release reported May exports of USD 87.75B (+53.2% YoY) and semiconductor exports of USD 37.16B (+169.4% YoY). KCS later listed the official May monthly final bulletin on 2026-06-15, confirming the release window."
+      },
+      {
+        key: "motie_kcs_202606_monthly",
+        section: "monthly_semiconductor",
+        sourceName: "MOTIE June 2026 and H1 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=283602&pg=&pp=&topic=O",
+        status: "official_public",
+        note: "July 1 MOTIE release reported June exports of USD 102.25B (+70.9% YoY), imports of USD 66.10B (+30.1% YoY), trade surplus of USD 36.15B, and semiconductor exports of USD 44.82B (+199.5% YoY)."
       },
       {
         key: "kcs_20260610_preliminary",
@@ -441,11 +450,32 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         overallExportYoYPct: 53.2,
         productKey: "semiconductor",
         productName: "半导体出口",
-        source: "official_public_media_repost",
-        status: "preliminary",
+        source: "official_public_crosschecked",
+        status: "final",
         sourceName: "MOTIE May 2026 Export-Import Trends, reposted by KDI",
         sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=281941",
-        note: "May semiconductor exports reached USD 37.16B, up 169.4% YoY; total exports reached USD 87.75B, up 53.2% YoY."
+        finalSourceName: "KCS 2026 May monthly import/export status [final]",
+        finalSourceUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
+        officialListUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
+        note: "May semiconductor exports reached USD 37.16B, up 169.4% YoY; total exports reached USD 87.75B, up 53.2% YoY. The June 1 MOTIE/KCS release was later reflected in the KCS May final monthly bulletin list on 2026-06-15."
+      },
+      {
+        period: "2026.06",
+        periodLabel: "2026年6月",
+        valueUsd: 44_820_000_000,
+        valueYoYPct: 199.5,
+        overallExportValueUsd: 102_250_000_000,
+        overallExportYoYPct: 70.9,
+        overallImportValueUsd: 66_100_000_000,
+        overallImportYoYPct: 30.1,
+        tradeBalanceUsd: 36_150_000_000,
+        productKey: "semiconductor",
+        productName: "半导体出口",
+        source: "official_public",
+        status: "preliminary",
+        sourceName: "MOTIE June 2026 and H1 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=283602&pg=&pp=&topic=O",
+        note: "June semiconductor exports reached USD 44.82B, up 199.5% YoY; total exports reached USD 102.25B, up 70.9% YoY; imports reached USD 66.10B, up 30.1% YoY; trade surplus reached USD 36.15B."
       }
     ],
     memoryDetail: loadProvisionalMemoryDetail(),
@@ -802,13 +832,16 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         hsCode: "semiconductor",
         productKey: "semiconductor",
         productName: "半导体出口",
-        source: "official_public_media_repost",
+        source: "official_public_crosschecked",
         status: "preliminary",
         sourceName: "MOTIE May 2026 Export-Import Trends, reposted by KDI",
         sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=281941",
+        finalSourceName: "KCS 2026 May monthly import/export status [final]",
+        finalSourceUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
+        officialListUrl: "https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891",
         overallExportValueUsd: 87_750_000_000,
         overallExportYoYPct: 53.2,
-        note: "May monthly release: total exports USD 87.75B (+53.2% YoY), semiconductor exports USD 37.16B (+169.4% YoY)."
+        note: "May monthly release: total exports USD 87.75B (+53.2% YoY), semiconductor exports USD 37.16B (+169.4% YoY). KCS listed the May final monthly bulletin on 2026-06-15."
       },
       {
         period: "2026.06-1~10",
@@ -835,6 +868,48 @@ export function buildSampleStore({ lastUpdated = sampleSnapshotUpdatedAt } = {})
         averageDailyExportYoYPct: 46.1,
         semiconductorSharePct: 38.7,
         note: "KCS June 1-10 provisional release: total exports USD 28.635B (+85.9% YoY), imports USD 23.352B (+35.6% YoY), trade surplus USD 5.282B, and semiconductor exports USD 11.068B (+205.8% YoY)."
+      },
+      {
+        period: "2026.06-1~20",
+        periodLabel: "6月1-20日",
+        valueUsd: 25_500_000_000,
+        valueYoYPct: 188.4,
+        weightKg: 0,
+        unitPriceUsdPerKg: null,
+        hsCode: "semiconductor",
+        productKey: "semiconductor",
+        productName: "半导体出口",
+        source: "official_public_media_repost",
+        status: "preliminary",
+        sourceName: "KCS June 1-20 2026 provisional release, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=282993",
+        overallExportValueUsd: 62_000_000_000,
+        overallExportYoYPct: 60.4,
+        overallImportValueUsd: 44_500_000_000,
+        overallImportYoYPct: 23.2,
+        tradeBalanceUsd: 17_500_000_000,
+        note: "KCS June 1-20 provisional release: total exports USD 62.0B (+60.4% YoY), imports USD 44.5B (+23.2% YoY), trade surplus USD 17.5B, and semiconductor exports USD 25.5B (+188.4% YoY), the highest June 1-20 semiconductor export value on record."
+      },
+      {
+        period: "2026.06-1~30",
+        periodLabel: "6月全月",
+        valueUsd: 44_820_000_000,
+        valueYoYPct: 199.5,
+        weightKg: 0,
+        unitPriceUsdPerKg: null,
+        hsCode: "semiconductor",
+        productKey: "semiconductor",
+        productName: "半导体出口",
+        source: "official_public",
+        status: "preliminary",
+        sourceName: "MOTIE June 2026 and H1 Export-Import Trends, reposted by KDI",
+        sourceUrl: "https://eiec.kdi.re.kr/policy/materialView.do?num=283602&pg=&pp=&topic=O",
+        overallExportValueUsd: 102_250_000_000,
+        overallExportYoYPct: 70.9,
+        overallImportValueUsd: 66_100_000_000,
+        overallImportYoYPct: 30.1,
+        tradeBalanceUsd: 36_150_000_000,
+        note: "June monthly release: total exports USD 102.25B (+70.9% YoY), imports USD 66.10B (+30.1% YoY), trade surplus USD 36.15B, and semiconductor exports USD 44.82B (+199.5% YoY)."
       }
     ]
   };
