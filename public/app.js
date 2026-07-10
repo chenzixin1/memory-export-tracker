@@ -779,8 +779,21 @@ function monthlyChartCard(segment) {
 
 function officialMonthlyBridgeCard() {
   const monthlyOfficial = state.data.officialMonthly ?? [];
-  const points = monthlyOfficial.slice(-6);
-  const latest = points.at(-1);
+  const byPeriod = new Map(monthlyOfficial.map((point) => [point.period, point]));
+  const points = monthlyOfficial.slice(-6).map((point) => {
+    const previousMonth = byPeriod.get(shiftPeriod(point.period, -1));
+    const previousYear = byPeriod.get(shiftPeriod(point.period, -12));
+    return {
+      period: point.period,
+      periodLabel: point.periodLabel,
+      value: point.valueUsd,
+      sequentialPct: percentChangeValue(point.valueUsd, previousMonth?.valueUsd),
+      yoyPct: Number.isFinite(point.valueYoYPct)
+        ? point.valueYoYPct
+        : percentChangeValue(point.valueUsd, previousYear?.valueUsd)
+    };
+  });
+  const latest = monthlyOfficial.at(-1);
   const tail = latest?.period === "2026.05"
     ? (state.data.preliminary ?? []).find((point) => point.period === "2026.05-21~31")
     : null;
@@ -788,18 +801,6 @@ function officialMonthlyBridgeCard() {
   const tertiaryLabel = tail ? "尾段估算" : "顺差";
   const tertiaryValue = tail ? compactUsd(tail.valueUsd ?? 0) : compactUsd(latest?.tradeBalanceUsd ?? 0);
   const labels = points.map((point) => point.period);
-  const series = [
-    {
-      name: "半导体月度总出口",
-      color: colors.semiconductor,
-      points: points.map((point) => ({
-        label: point.periodLabel,
-        value: point.valueUsd,
-        sourceName: point.sourceName,
-        sourceUrl: point.sourceUrl
-      }))
-    }
-  ];
   return `<section class="may-bridge-card">
     <div class="may-bridge-copy">
       <span>半导体总量月度口径 · 已到 ${escapeHtml(latest?.period ?? "--")}</span>
@@ -813,12 +814,11 @@ function officialMonthlyBridgeCard() {
       <a class="memory-source-link" href="${escapeHtml(latest?.sourceUrl ?? "#")}" target="_blank" rel="noreferrer">${escapeHtml(latest?.sourceName ?? "source")}</a>
     </div>
     <div class="may-bridge-chart">
-      ${chartSvg({
-        series,
+      ${amountGrowthDualAxisSvg({
+        points,
         labels,
-        formatter: compactUsd,
-        height: 250,
-        chartType: "line"
+        metric: "valueUsd",
+        height: 250
       })}
     </div>
   </section>`;
