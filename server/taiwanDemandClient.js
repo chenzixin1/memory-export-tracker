@@ -98,11 +98,15 @@ export function parseJapanSsdCsv(csv) {
   const hsIndex = header?.indexOf("HS") ?? -1;
   const countryIndex = header?.indexOf("Country") ?? -1;
   const yearIndex = header?.indexOf("Year") ?? -1;
-  if (hsIndex < 0 || countryIndex < 0 || yearIndex < 0) {
+  const directionIndex = header?.indexOf("Exp or Imp") ?? -1;
+  if (hsIndex < 0 || countryIndex < 0 || yearIndex < 0 || directionIndex < 0) {
     throw new Error("Japan e-Stat CSV columns changed");
   }
   const row = rows.find(
-    (candidate) => candidate[hsIndex]?.replaceAll("'", "") === "852351000" && candidate[countryIndex] === "106"
+    (candidate) =>
+      candidate[directionIndex] === "1" &&
+      candidate[hsIndex]?.replaceAll("'", "") === "852351000" &&
+      candidate[countryIndex] === "106"
   );
   if (!row) throw new Error("Japan e-Stat CSV has no HS 852351000 row for Taiwan country 106");
 
@@ -183,6 +187,7 @@ export async function refreshTaiwanDemand(existing) {
     fetchText(TAIWAN_METADATA_URL)
       .then(JSON.parse)
       .then(resolveTaiwanCsvUrl)
+      .catch(() => TAIWAN_CSV_URL)
       .then(fetchText)
       .then(parseTaiwanMofCsv),
     fetchText(JAPAN_DATASET_URL)

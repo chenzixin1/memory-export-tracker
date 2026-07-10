@@ -57,6 +57,7 @@ test("parseJapanSsdCsv selects Taiwan HS 852351000 and expands thousand JPY", ()
   const csv = [
     "Exp or Imp,Year,HS,Country,Unit1,Unit2,Quantity1-Year,Quantity2-Year,Value-Year,Quantity1-Jan,Quantity2-Jan,Value-Jan,Quantity1-Feb,Quantity2-Feb,Value-Feb,Quantity1-Mar,Quantity2-Mar,Value-Mar,Quantity1-Apr,Quantity2-Apr,Value-Apr,Quantity1-May,Quantity2-May,Value-May",
     "1,2026,'852351000',105,  ,NO,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2",
+    "2,2026,'852351000',106,  ,NO,0,9,9,0,9,9,0,9,9,0,9,9,0,9,9,0,9,9",
     "1,2026,'852351000',106,  ,NO,0,339580,2047652,0,62772,544477,0,54546,92551,0,50501,355826,0,60417,664647,0,111344,390151"
   ].join("\n");
 

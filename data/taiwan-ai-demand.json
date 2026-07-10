@@ -1,6 +1,6 @@
 {
   "meta": {
-    "lastVerifiedAt": "2026-07-10T10:27:22.789Z",
+    "lastVerifiedAt": "2026-07-10T10:31:25.528Z",
     "purpose": "Taiwan-side AI pull-demand proxy for Korea memory flow plus Japan-to-Taiwan SSD flow.",
     "notes": [
       "韩国→台湾使用台湾财政部开放数据，自动更新至 2026.06。该第16类口径是供应链代理，不等同于单一存储芯片 HS。",

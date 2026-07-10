@@ -1,6 +1,6 @@
 {
   "meta": {
-    "lastUpdated": "2026-07-10T10:27:23.814Z",
+    "lastUpdated": "2026-07-10T10:31:26.557Z",
     "nextScheduledUpdate": null,
     "mode": "mixed_public",
     "message": "已通过 KCS TradeData 官方网页接口更新月度 HS 品类出口金额、净重与单位价格。当前未配置 DATA_GO_KR_SERVICE_KEY。"
@@ -918,7 +918,7 @@
   ],
   "taiwanDemand": {
     "meta": {
-      "lastVerifiedAt": "2026-07-10T10:27:22.789Z",
+      "lastVerifiedAt": "2026-07-10T10:31:25.528Z",
       "purpose": "Taiwan-side AI pull-demand proxy for Korea memory flow plus Japan-to-Taiwan SSD flow.",
       "notes": [
         "韩国→台湾使用台湾财政部开放数据，自动更新至 2026.06。该第16类口径是供应链代理，不等同于单一存储芯片 HS。",
